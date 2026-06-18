@@ -67,6 +67,7 @@
         "timeago",
         "url_launcher",
         "uuid",
+        "video_player",
         "youtube_player_flutter"
       ],
       "devDependencies": [
@@ -213,6 +214,19 @@
       "name": "dartz",
       "version": "0.10.1",
       "dependencies": []
+    },
+    {
+      "name": "video_player",
+      "version": "2.11.1",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "html",
+        "video_player_android",
+        "video_player_avfoundation",
+        "video_player_platform_interface",
+        "video_player_web"
+      ]
     },
     {
       "name": "get_it",
@@ -1228,6 +1242,49 @@
       "dependencies": [
         "clock",
         "collection"
+      ]
+    },
+    {
+      "name": "video_player_web",
+      "version": "2.4.0",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "video_player_platform_interface",
+        "web"
+      ]
+    },
+    {
+      "name": "video_player_platform_interface",
+      "version": "6.7.0",
+      "dependencies": [
+        "flutter",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "video_player_avfoundation",
+      "version": "2.9.7",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "video_player_platform_interface"
+      ]
+    },
+    {
+      "name": "video_player_android",
+      "version": "2.9.5",
+      "dependencies": [
+        "flutter",
+        "video_player_platform_interface"
+      ]
+    },
+    {
+      "name": "html",
+      "version": "0.15.6",
+      "dependencies": [
+        "csslib",
+        "source_span"
       ]
     },
     {
@@ -2389,6 +2446,13 @@
         "meta",
         "path",
         "vm_service"
+      ]
+    },
+    {
+      "name": "csslib",
+      "version": "1.0.2",
+      "dependencies": [
+        "source_span"
       ]
     },
     {

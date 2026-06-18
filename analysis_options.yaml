@@ -9,6 +9,19 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # The folders below are the original auto-generated template (screens/blocs/
+  # repositories/DI) that were never wired together. The running app uses only
+  # lib/main.dart and does NOT import them. They are excluded from analysis so the
+  # Problems panel is clean; files remain on disk and can be ported in one by one.
+  exclude:
+    - lib/core/di/**
+    - lib/core/network/**
+    - lib/core/router/**
+    - lib/core/theme/**
+    - lib/data/repositories/**
+    - lib/presentation/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

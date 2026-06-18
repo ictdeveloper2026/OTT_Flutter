@@ -102,6 +102,9 @@ dependencies:
 
   # Dependency injection
   get_it: ^8.0.3
+
+  # Video playback (web + mobile)
+  video_player: ^2.9.2
   dartz: ^0.10.1
   logger: ^2.4.0
 
@@ -124,15 +127,5 @@ flutter:
     - assets/icons/
     - assets/animations/
     - assets/fonts/
-  fonts:
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Poppins-ExtraBold.ttf
-          weight: 800
+  # Poppins font is loaded at runtime via the google_fonts package (no bundled .ttf needed).
+  # Re-add a `fonts:` section here only if you drop real .ttf files into assets/fonts/.
