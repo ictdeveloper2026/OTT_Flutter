@@ -108,7 +108,7 @@ class AppTheme {
         labelStyle: TextStyle(color: textSecondary),
         hintStyle: TextStyle(color: textSecondary.withOpacity(0.6)),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -121,7 +121,7 @@ class AppTheme {
         side: BorderSide(color: textSecondary.withOpacity(0.2)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: primary,
         unselectedLabelColor: textSecondary,
         indicatorColor: primary,
@@ -208,6 +208,12 @@ class OttColors extends ThemeExtension<OttColors> {
     required this.textSecondary, required this.cardGradient, required this.heroGradient,
     required this.shimmerBase, required this.shimmerHighlight,
   });
+
+  // Convenience aliases used across screens/widgets.
+  Color get background => bg;
+  Color get divider => textSecondary.withOpacity(0.12);
+  Color get card => surface;
+  Color get textMuted => textSecondary;
 
   @override
   OttColors copyWith({Color? primary, Color? secondary, Color? accent, Color? bg,
