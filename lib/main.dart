@@ -222,6 +222,28 @@ class Api {
     final r = await _dio.get('/Live/$id');
     return Map<String, dynamic>.from(r.data['data'] ?? r.data);
   }
+
+  // Live TV channels (iptv-org)
+  Future<Map<String, dynamic>> liveTvChannels({String? country, String? language, String? category, String? q, int page = 1}) async {
+    final r = await _dio.get('/livetv/channels', queryParameters: {
+      if (country != null && country.isNotEmpty) 'country': country,
+      if (language != null && language.isNotEmpty) 'language': language,
+      if (category != null && category.isNotEmpty) 'category': category,
+      if (q != null && q.isNotEmpty) 'q': q,
+      'page': page,
+    });
+    return Map<String, dynamic>.from(r.data['data'] ?? r.data);
+  }
+
+  Future<Map<String, dynamic>> liveTvFilters() async {
+    final r = await _dio.get('/livetv/filters');
+    return Map<String, dynamic>.from(r.data['data'] ?? r.data);
+  }
+
+  Future<String> syncLiveTv() async {
+    final r = await _dio.post('/admin/livetv/sync');
+    return (r.data['message'] ?? 'Sync started').toString();
+  }
 }
 
 String posterOf(Map item) => (item['posterUrl'] ?? item['thumbnailUrl'] ?? item['bannerUrl'] ?? '') as String;
@@ -978,10 +1000,21 @@ class _LiveTabState extends State<LiveTab> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async => setState(() => _load = api.liveStreams()),
-      child: FutureBuilder<List<dynamic>>(
-        future: _load,
+    return Column(children: [
+      Material(
+        color: const Color(0xFF141414),
+        child: ListTile(
+          leading: const Icon(Icons.public, color: _red),
+          title: const Text('Browse Live TV Channels'),
+          subtitle: const Text('Thousands of free channels — by country & language'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LiveTvChannelsScreen())),
+        ),
+      ),
+      Expanded(child: RefreshIndicator(
+        onRefresh: () async => setState(() => _load = api.liveStreams()),
+        child: FutureBuilder<List<dynamic>>(
+          future: _load,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator(color: _red));
@@ -1038,6 +1071,150 @@ class _LiveTabState extends State<LiveTab> {
             },
           );
         },
+      ),
+      )),
+    ]);
+  }
+}
+
+// ── Live TV Channels (iptv-org) ──────────────────────────────────────────────
+class LiveTvChannelsScreen extends StatefulWidget {
+  const LiveTvChannelsScreen({super.key});
+  @override
+  State<LiveTvChannelsScreen> createState() => _LiveTvChannelsScreenState();
+}
+
+class _LiveTvChannelsScreenState extends State<LiveTvChannelsScreen> {
+  Map<String, dynamic>? _filters;
+  String? _country, _language;
+  final _q = TextEditingController();
+  List<dynamic> _channels = [];
+  int _page = 1, _total = 0;
+  bool _loading = true, _loadingMore = false;
+
+  @override
+  void initState() { super.initState(); _init(); }
+
+  Future<void> _init() async {
+    try { _filters = await api.liveTvFilters(); } catch (_) {}
+    await _load();
+  }
+
+  Future<void> _load() async {
+    setState(() { _loading = true; _page = 1; });
+    try {
+      final r = await api.liveTvChannels(country: _country, language: _language, q: _q.text, page: 1);
+      if (!mounted) return;
+      setState(() { _channels = r['items'] as List? ?? []; _total = (r['totalCount'] as int?) ?? 0; _loading = false; });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendly(e))));
+    }
+  }
+
+  Future<void> _more() async {
+    if (_loadingMore || _channels.length >= _total) return;
+    setState(() => _loadingMore = true);
+    try {
+      final r = await api.liveTvChannels(country: _country, language: _language, q: _q.text, page: _page + 1);
+      if (!mounted) return;
+      setState(() { _page++; _channels.addAll(r['items'] as List? ?? []); _loadingMore = false; });
+    } catch (_) {
+      if (mounted) setState(() => _loadingMore = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final countries = (_filters?['countries'] as List?) ?? [];
+    final languages = (_filters?['languages'] as List?) ?? [];
+    return Scaffold(
+      appBar: AppBar(title: Text('Live TV Channels${_total > 0 ? ' ($_total)' : ''}')),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+          child: Row(children: [
+            Expanded(child: DropdownButtonFormField<String?>(
+              initialValue: _country, isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Country', isDense: true),
+              items: [
+                const DropdownMenuItem<String?>(value: null, child: Text('All countries')),
+                ...countries.map((c) => DropdownMenuItem<String?>(value: c['code'] as String?,
+                    child: Text('${c['name']} (${c['count']})', overflow: TextOverflow.ellipsis))),
+              ],
+              onChanged: (v) { setState(() => _country = v); _load(); },
+            )),
+            const SizedBox(width: 8),
+            Expanded(child: DropdownButtonFormField<String?>(
+              initialValue: _language, isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Language', isDense: true),
+              items: [
+                const DropdownMenuItem<String?>(value: null, child: Text('All languages')),
+                ...languages.map((l) => DropdownMenuItem<String?>(value: l['code'] as String?,
+                    child: Text('${(l['code'] ?? '').toString().toUpperCase()} (${l['count']})'))),
+              ],
+              onChanged: (v) { setState(() => _language = v); _load(); },
+            )),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+          child: TextField(
+            controller: _q, textInputAction: TextInputAction.search, onSubmitted: (_) => _load(),
+            decoration: InputDecoration(hintText: 'Search channels…', isDense: true,
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: _load)),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: _loading
+              ? const Center(child: CircularProgressIndicator(color: _red))
+              : _channels.isEmpty
+                  ? const Center(child: Padding(padding: EdgeInsets.all(24),
+                      child: Text('No channels yet.\nAn admin can sync them from Admin → Live TV Channels.',
+                          textAlign: TextAlign.center, style: TextStyle(color: Colors.white38))))
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: (n) { if (n.metrics.pixels >= n.metrics.maxScrollExtent - 300) _more(); return false; },
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(8),
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 150, childAspectRatio: 1.25, crossAxisSpacing: 8, mainAxisSpacing: 8),
+                        itemCount: _channels.length,
+                        itemBuilder: (_, i) => _ChannelTile(_channels[i] as Map<String, dynamic>),
+                      ),
+                    ),
+        ),
+        if (_loadingMore) const Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(color: _red, strokeWidth: 2)),
+      ]),
+    );
+  }
+}
+
+class _ChannelTile extends StatelessWidget {
+  final Map<String, dynamic> ch;
+  const _ChannelTile(this.ch);
+  @override
+  Widget build(BuildContext context) {
+    final logo = (ch['logoUrl'] ?? '').toString();
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => PlayerScreen(url: (ch['streamUrl'] ?? '').toString(), title: (ch['name'] ?? '').toString()))),
+      child: Card(
+        color: const Color(0xFF181818),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(children: [
+            Expanded(child: logo.isEmpty
+                ? const Icon(Icons.tv, color: Colors.white24, size: 36)
+                : Image.network(logo, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.tv, color: Colors.white24, size: 36))),
+            const SizedBox(height: 6),
+            Text((ch['name'] ?? '').toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+            Text((ch['countryName'] ?? ch['country'] ?? '').toString(),
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10, color: Colors.white38)),
+          ]),
+        ),
       ),
     );
   }
@@ -1256,6 +1433,7 @@ class AdminScreen extends StatelessWidget {
       (Icons.view_agenda_outlined, 'Content rows', () => const AdminContentRowsScreen()),
       (Icons.people_outline, 'Users', () => const AdminUsersScreen()),
       (Icons.live_tv_outlined, 'Live streams', () => const AdminLiveScreen()),
+      (Icons.public, 'Live TV Channels (iptv-org)', () => const AdminLiveTvScreen()),
       (Icons.category_outlined, 'Genres', () => const AdminGenresScreen()),
       (Icons.local_offer_outlined, 'Promo codes', () => const AdminPromosScreen()),
       (Icons.palette_outlined, 'Branding', () => const AdminBrandingScreen()),
@@ -1593,6 +1771,73 @@ class _AdminBrandingScreenState extends State<AdminBrandingScreen> {
                     : const Text('Save branding'),
               ),
             ]),
+    );
+  }
+}
+
+// ── Admin: Live TV Channels (iptv-org sync) ───────────────────────────────────
+class AdminLiveTvScreen extends StatefulWidget {
+  const AdminLiveTvScreen({super.key});
+  @override
+  State<AdminLiveTvScreen> createState() => _AdminLiveTvScreenState();
+}
+
+class _AdminLiveTvScreenState extends State<AdminLiveTvScreen> {
+  late Future<Map<String, dynamic>> _f = api.liveTvFilters();
+  bool _syncing = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Live TV Channels')),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _f,
+        builder: (_, snap) {
+          final total = snap.data?['total'] ?? 0;
+          final countries = (snap.data?['countries'] as List?) ?? [];
+          return ListView(padding: const EdgeInsets.all(16), children: [
+            Card(
+              color: const Color(0xFF1A1A1A),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('$total channels imported', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  Text('${countries.length} countries', style: const TextStyle(color: Colors.white54)),
+                ]),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Sync the latest free channels from iptv-org. Runs in the background (~1 minute); refresh the count after.',
+                style: TextStyle(color: Colors.white60)),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: _syncing ? null : () async {
+                setState(() => _syncing = true);
+                try {
+                  final msg = await api.syncLiveTv();
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+                } catch (e) {
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendly(e))));
+                } finally {
+                  if (mounted) setState(() => _syncing = false);
+                }
+              },
+              style: FilledButton.styleFrom(backgroundColor: _red, minimumSize: const Size.fromHeight(48)),
+              icon: _syncing
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.sync),
+              label: Text(_syncing ? 'Starting…' : 'Sync from iptv-org'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(onPressed: () => setState(() => _f = api.liveTvFilters()), child: const Text('Refresh count')),
+            const SizedBox(height: 16),
+            const Text('Source: github.com/iptv-org — free, publicly listed channels (Unlicense). Note: many are third-party '
+                'rebroadcasts; for a production service carry only channels you are licensed for.',
+                style: TextStyle(color: Colors.white38, fontSize: 12)),
+          ]);
+        },
+      ),
     );
   }
 }
