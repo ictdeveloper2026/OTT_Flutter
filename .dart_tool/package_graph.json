@@ -68,6 +68,7 @@
         "url_launcher",
         "uuid",
         "video_player",
+        "web",
         "youtube_player_flutter"
       ],
       "devDependencies": [
@@ -213,6 +214,11 @@
     {
       "name": "dartz",
       "version": "0.10.1",
+      "dependencies": []
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
       "dependencies": []
     },
     {
@@ -1319,11 +1325,6 @@
       "dependencies": [
         "ffi"
       ]
-    },
-    {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
     },
     {
       "name": "package_info_plus_platform_interface",

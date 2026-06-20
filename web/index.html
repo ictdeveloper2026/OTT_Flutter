@@ -31,6 +31,25 @@
 
   <title>streamflix</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- hls.js for playing HLS (.m3u8) live streams in browsers that lack native support (e.g. Chrome) -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+  <script>
+    // Attaches an HLS source to a <video>, using hls.js where the browser can't play HLS natively.
+    window.attachHls = function (video, url) {
+      try {
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = url;
+        } else if (window.Hls && window.Hls.isSupported()) {
+          var hls = new window.Hls();
+          hls.loadSource(url);
+          hls.attachMedia(video);
+        } else {
+          video.src = url; // last resort
+        }
+      } catch (e) { video.src = url; }
+    };
+  </script>
 </head>
 <body>
   <!--
