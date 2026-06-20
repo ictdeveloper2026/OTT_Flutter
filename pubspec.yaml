@@ -105,6 +105,7 @@ dependencies:
 
   # Video playback (web + mobile)
   video_player: ^2.9.2
+  web: ^1.1.0   # used by hls_web.dart for HLS playback on web
   dartz: ^0.10.1
   logger: ^2.4.0
 

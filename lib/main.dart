@@ -6,10 +6,12 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+import 'hls_stub.dart' if (dart.library.html) 'hls_web.dart' as hlsplayer;
 
 const _apiBase = String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8080');
 const _red = Color(0xFFE50914);
@@ -859,7 +861,7 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  late final VideoPlayerController _c;
+  VideoPlayerController? _c; // null on web (we use hls.js instead)
   bool _ready = false;
   String? _error;
   Timer? _timer;
@@ -867,11 +869,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _c = VideoPlayerController.networkUrl(Uri.parse(widget.url));
-    _c.initialize().then((_) {
+    if (kIsWeb) { _ready = true; return; } // web → hls.js <video> view
+    final c = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _c = c;
+    c.initialize().then((_) {
       if (!mounted) return;
       setState(() => _ready = true);
-      _c.play();
+      c.play();
       if (widget.contentId != null) {
         _timer = Timer.periodic(const Duration(seconds: 15), (_) => _saveProgress());
       }
@@ -881,35 +885,39 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   void _saveProgress() {
-    if (widget.contentId == null || !_c.value.isInitialized) return;
-    api.saveProgress(widget.contentId!, _c.value.position.inSeconds, _c.value.duration.inSeconds);
+    final c = _c;
+    if (widget.contentId == null || c == null || !c.value.isInitialized) return;
+    api.saveProgress(widget.contentId!, c.value.position.inSeconds, c.value.duration.inSeconds);
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _saveProgress();
-    _c.dispose();
+    _c?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = _c;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(title: Text(widget.title), backgroundColor: Colors.black),
-      body: Center(
-        child: _error != null
-            ? Text(_error!, style: const TextStyle(color: Colors.white60))
-            : _ready
-                ? AspectRatio(aspectRatio: _c.value.aspectRatio, child: VideoPlayer(_c))
-                : const CircularProgressIndicator(color: _red),
-      ),
-      floatingActionButton: _ready
+      body: kIsWeb
+          ? hlsplayer.buildHlsPlayer(widget.url)
+          : Center(
+              child: _error != null
+                  ? Text(_error!, style: const TextStyle(color: Colors.white60))
+                  : (_ready && c != null)
+                      ? AspectRatio(aspectRatio: c.value.aspectRatio, child: VideoPlayer(c))
+                      : const CircularProgressIndicator(color: _red),
+            ),
+      floatingActionButton: (!kIsWeb && _ready && c != null)
           ? FloatingActionButton(
               backgroundColor: _red,
-              onPressed: () => setState(() => _c.value.isPlaying ? _c.pause() : _c.play()),
-              child: Icon(_c.value.isPlaying ? Icons.pause : Icons.play_arrow),
+              onPressed: () => setState(() => c.value.isPlaying ? c.pause() : c.play()),
+              child: Icon(c.value.isPlaying ? Icons.pause : Icons.play_arrow),
             )
           : null,
     );
