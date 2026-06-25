@@ -4,7 +4,6 @@ import '../../../data/repositories/live_repository.dart';
 import '../../../data/models/content.dart';
 
 part 'live_event.dart';
-part 'live_state.dart';
 
 class LiveBloc extends Bloc<LiveEvent, LiveState> {
   final LiveRepository _repository;

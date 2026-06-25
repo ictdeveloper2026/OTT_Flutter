@@ -10872,14 +10872,15 @@ extension PagedResultPatterns<T> on PagedResult<T> {
 
 /// @nodoc
 @JsonSerializable(genericArgumentFactories: true)
-class _PagedResult<T> implements PagedResult<T> {
+class _PagedResult<T> extends PagedResult<T> {
   const _PagedResult(
       {required final List<T> items,
       required this.totalCount,
       required this.page,
       required this.pageSize,
       required this.hasMore})
-      : _items = items;
+      : _items = items,
+        super._();
   factory _PagedResult.fromJson(
           Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
       _$PagedResultFromJson(json, fromJsonT);

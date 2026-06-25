@@ -349,6 +349,8 @@ abstract class WatchPartyMember with _$WatchPartyMember {
 // ── Pagination Wrapper ──
 @Freezed(genericArgumentFactories: true)
 abstract class PagedResult<T> with _$PagedResult<T> {
+  const PagedResult._();
+
   const factory PagedResult({
     required List<T> items,
     required int totalCount,
@@ -356,6 +358,10 @@ abstract class PagedResult<T> with _$PagedResult<T> {
     required int pageSize,
     required bool hasMore,
   }) = _PagedResult<T>;
+
+  // Aliases consumed by blocs/screens.
+  List<T> get data => items;
+  bool get hasNextPage => hasMore;
 
   factory PagedResult.fromJson(Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
       _$PagedResultFromJson(json, fromJsonT);

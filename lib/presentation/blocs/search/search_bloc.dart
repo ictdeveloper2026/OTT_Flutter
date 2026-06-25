@@ -6,7 +6,6 @@ import '../../../core/constants/app_constants.dart';
 import 'dart:async';
 
 part 'search_event.dart';
-part 'search_state.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final ContentRepository _repository;

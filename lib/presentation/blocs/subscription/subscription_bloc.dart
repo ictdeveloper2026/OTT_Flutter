@@ -4,7 +4,6 @@ import '../../../data/repositories/subscription_repository.dart';
 import '../../../data/models/content.dart';
 
 part 'subscription_event.dart';
-part 'subscription_state.dart';
 
 class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   final SubscriptionRepository _repository;

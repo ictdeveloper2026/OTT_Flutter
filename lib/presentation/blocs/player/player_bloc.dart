@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../data/repositories/content_repository.dart';
 import '../../../data/models/content.dart';
+import '../../../data/models/stream_info.dart';
 
 part 'player_event.dart';
 part 'player_state.dart';

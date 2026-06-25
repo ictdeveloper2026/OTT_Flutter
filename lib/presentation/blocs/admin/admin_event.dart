@@ -106,7 +106,7 @@ class AdminLiveStreamsReady extends AdminState {
 }
 
 class AdminAnalyticsReady extends AdminState {
-  final Map<String, dynamic> data;
+  final List<dynamic> data;
   const AdminAnalyticsReady({required this.data});
   @override
   List<Object?> get props => [data];

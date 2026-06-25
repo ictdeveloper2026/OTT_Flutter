@@ -4,7 +4,6 @@ import '../../../data/repositories/profile_repository.dart';
 import '../../../data/models/content.dart';
 
 part 'profile_event.dart';
-part 'profile_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ProfileRepository _repository;
