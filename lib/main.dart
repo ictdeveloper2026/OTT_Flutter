@@ -14,15 +14,31 @@ import 'package:video_player/video_player.dart';
 import 'hls_stub.dart' if (dart.library.html) 'hls_web.dart' as hlsplayer;
 
 const _apiBase = String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8080');
-const _red = Color(0xFFE50914);
+Color _red = const Color(0xFFE50914); // brand primary, overridden by dynamic branding
 
 late final Api api;
+
+// Dynamic branding (admin -> /config/public). Drives the app's brand color + name live.
+final brandingNotifier = ValueNotifier<Map<String, dynamic>>(<String, dynamic>{});
+Color _hexColor(dynamic v, Color fallback) {
+  if (v is! String || v.trim().isEmpty) return fallback;
+  var h = v.trim().replaceFirst('#', '');
+  if (h.length == 6) h = 'FF';
+  final n = int.tryParse(h, radix: 16);
+  return n == null ? fallback : Color(n);
+}
+Future<void> loadBranding() async {
+  try {
+    brandingNotifier.value = await api.publicBranding();
+  } catch (_) {}
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   api = Api(prefs);
   runApp(const OttApp());
+  loadBranding();
 }
 
 // ── API client ───────────────────────────────────────────────────────────────
@@ -203,6 +219,13 @@ class Api {
 
   // Genres
   Future<List<dynamic>> genres() async => _list((await _dio.get('/config/genres')).data);
+
+  Future<Map<String, dynamic>> publicBranding() async {
+    final r = await _dio.get('/config/public');
+    final data = Map<String, dynamic>.from(r.data['data'] ?? r.data);
+    final b = data['branding'];
+    return b is Map ? Map<String, dynamic>.from(b) : <String, dynamic>{};
+  }
   Future<List<dynamic>> byGenre(String genreId) async => _list((await _dio.get('/contents/genre/$genreId')).data);
 
   // Notifications
@@ -255,19 +278,29 @@ class OttApp extends StatelessWidget {
   const OttApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'OTT Platform',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0B0B0B),
-        colorScheme: const ColorScheme.dark(primary: _red, surface: Color(0xFF1A1A1A)),
-        inputDecorationTheme: const InputDecorationTheme(filled: true, fillColor: Color(0xFF1A1A1A)),
-      ),
-      home: !api.isLoggedIn
-          ? const LoginScreen()
-          : (api.hasProfile ? const HomeShell() : const ProfileGate()),
+    return ValueListenableBuilder<Map<String, dynamic>>(
+      valueListenable: brandingNotifier,
+      builder: (context, b, _) {
+        // Apply the dynamic brand color globally so every `_red` usage re-themes.
+        _red = _hexColor(b['primaryColor'], const Color(0xFFE50914));
+        final bg = _hexColor(b['backgroundColor'], const Color(0xFF0B0B0B));
+        final surface = _hexColor(b['surfaceColor'], const Color(0xFF1A1A1A));
+        final appName = (b['appName'] as String?)?.trim();
+        return MaterialApp(
+          title: (appName == null || appName.isEmpty) ? 'OTT Platform' : appName,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: bg,
+            colorScheme: ColorScheme.dark(primary: _red, surface: surface),
+            inputDecorationTheme: InputDecorationTheme(filled: true, fillColor: surface),
+          ),
+          home: !api.isLoggedIn
+              ? const LoginScreen()
+              : (api.hasProfile ? const HomeShell() : const ProfileGate()),
+        );
+      },
     );
   }
 }
@@ -329,7 +362,7 @@ class _ProfileGateState extends State<ProfileGate> {
           future: _load,
           builder: (context, snap) {
             if (snap.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator(color: _red));
+              return Center(child: CircularProgressIndicator(color: _red));
             }
             if (snap.hasError) {
               return ErrorView(message: friendly(snap.error!), onRetry: () => setState(() => _load = _fetch()));
@@ -424,7 +457,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('OTT Platform', textAlign: TextAlign.center,
+                Text('OTT Platform', textAlign: TextAlign.center,
                     style: TextStyle(color: _red, fontSize: 34, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 32),
                 TextField(controller: _email, decoration: const InputDecoration(labelText: 'Email')),
@@ -471,7 +504,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _error;
 
   Future<void> _register() async {
-    if (_email.text.trim().isEmpty || _pass.text.length < 6) {
+    if (_email.text.trim().isEmpty || _pass.text.length < 8) {
       setState(() => _error = 'Enter an email and a password of at least 6 characters.');
       return;
     }
@@ -510,7 +543,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 12),
                 TextField(controller: _email, decoration: const InputDecoration(labelText: 'Email')),
                 const SizedBox(height: 12),
-                TextField(controller: _pass, obscureText: true, decoration: const InputDecoration(labelText: 'Password (min 6)')),
+                TextField(controller: _pass, obscureText: true, decoration: const InputDecoration(labelText: 'Password (min 8)')),
                 const SizedBox(height: 20),
                 if (_error != null)
                   Padding(padding: const EdgeInsets.only(bottom: 12),
@@ -584,7 +617,7 @@ class _HomeTabState extends State<HomeTab> {
         future: _load,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator(color: _red));
+            return Center(child: CircularProgressIndicator(color: _red));
           }
           if (snap.hasError) {
             return ListView(children: [const _HomeHeader(), const SizedBox(height: 80),
@@ -619,7 +652,7 @@ class _HomeHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
       child: Row(children: [
-        const Text('OTT Platform', style: TextStyle(color: _red, fontSize: 22, fontWeight: FontWeight.w800)),
+        Text('OTT Platform', style: TextStyle(color: _red, fontSize: 22, fontWeight: FontWeight.w800)),
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.notifications_none),
@@ -911,7 +944,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ? Text(_error!, style: const TextStyle(color: Colors.white60))
                   : (_ready && c != null)
                       ? AspectRatio(aspectRatio: c.value.aspectRatio, child: VideoPlayer(c))
-                      : const CircularProgressIndicator(color: _red),
+                      : CircularProgressIndicator(color: _red),
             ),
       floatingActionButton: (!kIsWeb && _ready && c != null)
           ? FloatingActionButton(
@@ -1012,7 +1045,7 @@ class _LiveTabState extends State<LiveTab> {
       Material(
         color: const Color(0xFF141414),
         child: ListTile(
-          leading: const Icon(Icons.public, color: _red),
+          leading: Icon(Icons.public, color: _red),
           title: const Text('Browse Live TV Channels'),
           subtitle: const Text('Thousands of free channels — by country & language'),
           trailing: const Icon(Icons.chevron_right),
@@ -1025,7 +1058,7 @@ class _LiveTabState extends State<LiveTab> {
           future: _load,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator(color: _red));
+            return Center(child: CircularProgressIndicator(color: _red));
           }
           if (snap.hasError) {
             return ErrorView(message: friendly(snap.error!), onRetry: () => setState(() => _load = api.liveStreams()));
@@ -1070,7 +1103,7 @@ class _LiveTabState extends State<LiveTab> {
                     ListTile(
                       title: Text((m['title'] ?? '').toString()),
                       subtitle: Text(m['category']?.toString() ?? (live ? 'Live now' : (m['status'] ?? '').toString())),
-                      trailing: const Icon(Icons.play_circle_outline, color: _red),
+                      trailing: Icon(Icons.play_circle_outline, color: _red),
                       onTap: () => _playLive(context, m),
                     ),
                   ],
@@ -1178,7 +1211,7 @@ class _LiveTvChannelsScreenState extends State<LiveTvChannelsScreen> {
         const SizedBox(height: 8),
         Expanded(
           child: _loading
-              ? const Center(child: CircularProgressIndicator(color: _red))
+              ? Center(child: CircularProgressIndicator(color: _red))
               : _channels.isEmpty
                   ? const Center(child: Padding(padding: EdgeInsets.all(24),
                       child: Text('No channels yet.\nAn admin can sync them from Admin → Live TV Channels.',
@@ -1194,7 +1227,7 @@ class _LiveTvChannelsScreenState extends State<LiveTvChannelsScreen> {
                       ),
                     ),
         ),
-        if (_loadingMore) const Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(color: _red, strokeWidth: 2)),
+        if (_loadingMore) Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(color: _red, strokeWidth: 2)),
       ]),
     );
   }
@@ -1245,7 +1278,7 @@ class _MyListTabState extends State<MyListTab> {
         future: _load,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator(color: _red));
+            return Center(child: CircularProgressIndicator(color: _red));
           }
           final items = (snap.data ?? []);
           if (items.isEmpty) {
@@ -1306,7 +1339,7 @@ class ProfileTab extends StatelessWidget {
         ),
         if (api.isAdmin)
           ListTile(
-            leading: const Icon(Icons.admin_panel_settings, color: _red),
+            leading: Icon(Icons.admin_panel_settings, color: _red),
             title: const Text('Admin panel'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminScreen())),
@@ -1401,7 +1434,7 @@ class _AdminListScaffoldState extends State<AdminListScaffold> {
       body: FutureBuilder<List<dynamic>>(
         future: _f,
         builder: (context, snap) {
-          if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator(color: _red));
+          if (snap.connectionState != ConnectionState.done) return Center(child: CircularProgressIndicator(color: _red));
           if (snap.hasError) return ErrorView(message: friendly(snap.error!), onRetry: _refresh);
           final items = snap.data ?? [];
           if (items.isEmpty) return const Center(child: Text('Nothing here yet.', style: TextStyle(color: Colors.white38)));
@@ -1752,6 +1785,7 @@ class _AdminBrandingScreenState extends State<AdminBrandingScreen> {
     setState(() => _saving = true);
     try {
       await api.updateBranding({for (final e in _fields.entries) e.key: e.value.text.trim()});
+      await loadBranding(); // re-theme the app live
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Branding saved')));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendly(e))));
@@ -1765,7 +1799,7 @@ class _AdminBrandingScreenState extends State<AdminBrandingScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Branding')),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: _red))
+          ? Center(child: CircularProgressIndicator(color: _red))
           : ListView(padding: const EdgeInsets.all(16), children: [
               for (final e in _fields.entries)
                 Padding(padding: const EdgeInsets.only(bottom: 12),
@@ -1869,7 +1903,7 @@ class _PlansScreenState extends State<PlansScreen> {
         future: _plans,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator(color: _red));
+            return Center(child: CircularProgressIndicator(color: _red));
           }
           if (snap.hasError) {
             return ErrorView(message: friendly(snap.error!), onRetry: () => setState(() {}));
@@ -1942,7 +1976,7 @@ class _PlanCard extends StatelessWidget {
             ]),
             const SizedBox(height: 4),
             Text('${plan['currency'] ?? ''} ${plan['price'] ?? ''} / ${plan['billingCycle'] ?? 'month'}',
-                style: const TextStyle(color: _red, fontSize: 16, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: _red, fontSize: 16, fontWeight: FontWeight.w600)),
             if ((plan['description'] ?? '').toString().isNotEmpty) ...[
               const SizedBox(height: 6),
               Text(plan['description'].toString(), style: const TextStyle(color: Colors.white60, fontSize: 13)),
@@ -2035,7 +2069,7 @@ class NotificationsScreen extends StatelessWidget {
         future: api.notifications(),
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator(color: _red));
+            return Center(child: CircularProgressIndicator(color: _red));
           }
           final items = (snap.data?['items'] is List) ? snap.data!['items'] as List : const [];
           if (items.isEmpty) {
@@ -2069,7 +2103,7 @@ class _GenreBrowse extends StatelessWidget {
       future: api.genres(),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator(color: _red));
+          return Center(child: CircularProgressIndicator(color: _red));
         }
         final genres = snap.data ?? [];
         if (genres.isEmpty) {
@@ -2106,7 +2140,7 @@ class GenreScreen extends StatelessWidget {
         future: api.byGenre(genreId),
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator(color: _red));
+            return Center(child: CircularProgressIndicator(color: _red));
           }
           final items = snap.data ?? [];
           if (items.isEmpty) {
