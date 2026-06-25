@@ -8,8 +8,8 @@ part of 'content.dart';
 
 _BrandingConfig _$BrandingConfigFromJson(Map<String, dynamic> json) =>
     _BrandingConfig(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      tenantId: (json['tenantId'] as num?)?.toInt() ?? 0,
+      id: json['id'] as String? ?? '',
+      tenantId: json['tenantId'] as String? ?? '',
       logoUrl: json['logoUrl'] as String?,
       faviconUrl: json['faviconUrl'] as String?,
       primaryColor: json['primaryColor'] as String? ?? '#E50914',
@@ -47,11 +47,11 @@ Map<String, dynamic> _$BrandingConfigToJson(_BrandingConfig instance) =>
     };
 
 _Content _$ContentFromJson(Map<String, dynamic> json) => _Content(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       title: json['title'] as String,
-      slug: json['slug'] as String,
-      type: json['type'] as String,
-      accessTier: json['accessTier'] as String,
+      type: json['type'] as String? ?? 'movie',
+      slug: json['slug'] as String?,
+      accessTier: json['monetizationModel'] as String?,
       description: json['description'] as String?,
       shortDescription: json['shortDescription'] as String?,
       thumbnailUrl: json['thumbnailUrl'] as String?,
@@ -62,14 +62,14 @@ _Content _$ContentFromJson(Map<String, dynamic> json) => _Content(
       trailerVideoId: json['trailerVideoId'] as String?,
       releaseYear: (json['releaseYear'] as num?)?.toInt(),
       durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
-      contentRating: json['contentRating'] as String?,
+      contentRating: json['ageRating'] as String?,
       status: json['status'] as String?,
       averageRating: (json['averageRating'] as num?)?.toDouble(),
       totalRatings: (json['totalRatings'] as num?)?.toInt(),
       totalViews: (json['totalViews'] as num?)?.toInt(),
       isFeatured: json['isFeatured'] as bool?,
       isTrending: json['isTrending'] as bool?,
-      isNewRelease: json['isNewRelease'] as bool?,
+      isNewRelease: json['isNew'] as bool?,
       isOriginal: json['isOriginal'] as bool?,
       languageName: json['languageName'] as String?,
       genres:
@@ -94,7 +94,7 @@ _Content _$ContentFromJson(Map<String, dynamic> json) => _Content(
           : WatchProgress.fromJson(
               json['watchProgress'] as Map<String, dynamic>),
       isInWatchlist: json['isInWatchlist'] as bool?,
-      userRating: json['userRating'] as String?,
+      userRating: (json['userRating'] as num?)?.toDouble(),
       imdbRating: (json['imdbRating'] as num?)?.toDouble(),
       imdbId: json['imdbId'] as String?,
     );
@@ -102,9 +102,9 @@ _Content _$ContentFromJson(Map<String, dynamic> json) => _Content(
 Map<String, dynamic> _$ContentToJson(_Content instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'slug': instance.slug,
       'type': instance.type,
-      'accessTier': instance.accessTier,
+      'slug': instance.slug,
+      'monetizationModel': instance.accessTier,
       'description': instance.description,
       'shortDescription': instance.shortDescription,
       'thumbnailUrl': instance.thumbnailUrl,
@@ -115,14 +115,14 @@ Map<String, dynamic> _$ContentToJson(_Content instance) => <String, dynamic>{
       'trailerVideoId': instance.trailerVideoId,
       'releaseYear': instance.releaseYear,
       'durationSeconds': instance.durationSeconds,
-      'contentRating': instance.contentRating,
+      'ageRating': instance.contentRating,
       'status': instance.status,
       'averageRating': instance.averageRating,
       'totalRatings': instance.totalRatings,
       'totalViews': instance.totalViews,
       'isFeatured': instance.isFeatured,
       'isTrending': instance.isTrending,
-      'isNewRelease': instance.isNewRelease,
+      'isNew': instance.isNewRelease,
       'isOriginal': instance.isOriginal,
       'languageName': instance.languageName,
       'genres': instance.genres,
@@ -139,7 +139,7 @@ Map<String, dynamic> _$ContentToJson(_Content instance) => <String, dynamic>{
     };
 
 _CastMember _$CastMemberFromJson(Map<String, dynamic> json) => _CastMember(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       personName: json['personName'] as String,
       role: json['role'] as String,
       characterName: json['characterName'] as String?,
@@ -158,7 +158,7 @@ Map<String, dynamic> _$CastMemberToJson(_CastMember instance) =>
     };
 
 _SeriesInfo _$SeriesInfoFromJson(Map<String, dynamic> json) => _SeriesInfo(
-      seriesId: (json['seriesId'] as num).toInt(),
+      seriesId: json['seriesId'] as String,
       totalSeasons: (json['totalSeasons'] as num).toInt(),
       totalEpisodes: (json['totalEpisodes'] as num).toInt(),
       status: json['status'] as String,
@@ -177,7 +177,7 @@ Map<String, dynamic> _$SeriesInfoToJson(_SeriesInfo instance) =>
     };
 
 _Season _$SeasonFromJson(Map<String, dynamic> json) => _Season(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       seasonNumber: (json['seasonNumber'] as num).toInt(),
       title: json['title'] as String?,
       year: (json['year'] as num?)?.toInt(),
@@ -197,13 +197,13 @@ Map<String, dynamic> _$SeasonToJson(_Season instance) => <String, dynamic>{
     };
 
 _Episode _$EpisodeFromJson(Map<String, dynamic> json) => _Episode(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       episodeNumber: (json['episodeNumber'] as num).toInt(),
       title: json['title'] as String,
       description: json['description'] as String?,
       durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
       thumbnailUrl: json['thumbnailUrl'] as String?,
-      contentId: (json['contentId'] as num?)?.toInt(),
+      contentId: json['contentId'] as String?,
       watchProgress: json['watchProgress'] == null
           ? null
           : WatchProgress.fromJson(
@@ -222,7 +222,7 @@ Map<String, dynamic> _$EpisodeToJson(_Episode instance) => <String, dynamic>{
     };
 
 _VideoAsset _$VideoAssetFromJson(Map<String, dynamic> json) => _VideoAsset(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       playerType: json['playerType'] as String,
       status: json['status'] as String,
       hlsManifestUrl: json['hlsManifestUrl'] as String?,
@@ -259,7 +259,7 @@ Map<String, dynamic> _$VideoQualityToJson(_VideoQuality instance) =>
     };
 
 _Subtitle _$SubtitleFromJson(Map<String, dynamic> json) => _Subtitle(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       languageCode: json['languageCode'] as String,
       label: json['label'] as String,
       format: json['format'] as String,
@@ -277,7 +277,7 @@ Map<String, dynamic> _$SubtitleToJson(_Subtitle instance) => <String, dynamic>{
     };
 
 _AudioTrack _$AudioTrackFromJson(Map<String, dynamic> json) => _AudioTrack(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       languageCode: json['languageCode'] as String,
       label: json['label'] as String,
       trackIndex: (json['trackIndex'] as num).toInt(),
@@ -314,7 +314,7 @@ Map<String, dynamic> _$WatchProgressToJson(_WatchProgress instance) =>
     };
 
 _LiveStream _$LiveStreamFromJson(Map<String, dynamic> json) => _LiveStream(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       title: json['title'] as String,
       status: json['status'] as String,
       streamType: json['streamType'] as String,
@@ -360,7 +360,7 @@ Map<String, dynamic> _$LiveStreamToJson(_LiveStream instance) =>
 
 _SubscriptionPlan _$SubscriptionPlanFromJson(Map<String, dynamic> json) =>
     _SubscriptionPlan(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       name: json['name'] as String,
       price: (json['price'] as num).toDouble(),
       currency: json['currency'] as String,
@@ -396,7 +396,7 @@ Map<String, dynamic> _$SubscriptionPlanToJson(_SubscriptionPlan instance) =>
 
 _UserSubscription _$UserSubscriptionFromJson(Map<String, dynamic> json) =>
     _UserSubscription(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       plan: SubscriptionPlan.fromJson(json['plan'] as Map<String, dynamic>),
       status: json['status'] as String,
       startDate: DateTime.parse(json['startDate'] as String),
@@ -417,7 +417,7 @@ Map<String, dynamic> _$UserSubscriptionToJson(_UserSubscription instance) =>
     };
 
 _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       displayName: json['displayName'] as String,
       avatarUrl: json['avatarUrl'] as String?,
       avatarColor: json['avatarColor'] as String?,
@@ -442,7 +442,7 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
     };
 
 _Banner _$BannerFromJson(Map<String, dynamic> json) => _Banner(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       title: json['title'] as String?,
       subtitle: json['subtitle'] as String?,
       imageUrl: json['imageUrl'] as String,
@@ -466,7 +466,7 @@ Map<String, dynamic> _$BannerToJson(_Banner instance) => <String, dynamic>{
     };
 
 _ContentRow _$ContentRowFromJson(Map<String, dynamic> json) => _ContentRow(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       title: json['title'] as String,
       rowType: json['rowType'] as String,
       items: (json['items'] as List<dynamic>)
@@ -486,7 +486,7 @@ Map<String, dynamic> _$ContentRowToJson(_ContentRow instance) =>
 
 _AppNotification _$AppNotificationFromJson(Map<String, dynamic> json) =>
     _AppNotification(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       title: json['title'] as String,
       body: json['body'] as String,
       type: json['type'] as String,
@@ -512,7 +512,7 @@ Map<String, dynamic> _$AppNotificationToJson(_AppNotification instance) =>
 
 _WatchParty _$WatchPartyFromJson(Map<String, dynamic> json) => _WatchParty(
       code: json['code'] as String,
-      contentId: (json['contentId'] as num).toInt(),
+      contentId: json['contentId'] as String,
       status: json['status'] as String,
       isPlaying: json['isPlaying'] as bool,
       currentPosition: (json['currentPosition'] as num).toInt(),
@@ -537,7 +537,7 @@ Map<String, dynamic> _$WatchPartyToJson(_WatchParty instance) =>
 
 _WatchPartyMember _$WatchPartyMemberFromJson(Map<String, dynamic> json) =>
     _WatchPartyMember(
-      userId: (json['userId'] as num).toInt(),
+      userId: json['userId'] as String,
       displayName: json['displayName'] as String,
       avatarUrl: json['avatarUrl'] as String?,
       isHost: json['isHost'] as bool,

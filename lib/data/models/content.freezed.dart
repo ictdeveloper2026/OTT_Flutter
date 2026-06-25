@@ -14,8 +14,8 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$BrandingConfig {
-  int get id;
-  int get tenantId;
+  String get id;
+  String get tenantId;
   String? get logoUrl;
   String? get faviconUrl;
   String get primaryColor;
@@ -112,8 +112,8 @@ abstract mixin class $BrandingConfigCopyWith<$Res> {
       _$BrandingConfigCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
-      int tenantId,
+      {String id,
+      String tenantId,
       String? logoUrl,
       String? faviconUrl,
       String primaryColor,
@@ -164,11 +164,11 @@ class _$BrandingConfigCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       tenantId: null == tenantId
           ? _self.tenantId
           : tenantId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       logoUrl: freezed == logoUrl
           ? _self.logoUrl
           : logoUrl // ignore: cast_nullable_to_non_nullable
@@ -323,8 +323,8 @@ extension BrandingConfigPatterns on BrandingConfig {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
-            int tenantId,
+            String id,
+            String tenantId,
             String? logoUrl,
             String? faviconUrl,
             String primaryColor,
@@ -383,8 +383,8 @@ extension BrandingConfigPatterns on BrandingConfig {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
-            int tenantId,
+            String id,
+            String tenantId,
             String? logoUrl,
             String? faviconUrl,
             String primaryColor,
@@ -441,8 +441,8 @@ extension BrandingConfigPatterns on BrandingConfig {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
-            int tenantId,
+            String id,
+            String tenantId,
             String? logoUrl,
             String? faviconUrl,
             String primaryColor,
@@ -489,8 +489,8 @@ extension BrandingConfigPatterns on BrandingConfig {
 @JsonSerializable()
 class _BrandingConfig extends BrandingConfig {
   const _BrandingConfig(
-      {this.id = 0,
-      this.tenantId = 0,
+      {this.id = '',
+      this.tenantId = '',
       this.logoUrl,
       this.faviconUrl,
       this.primaryColor = '#E50914',
@@ -511,10 +511,10 @@ class _BrandingConfig extends BrandingConfig {
 
   @override
   @JsonKey()
-  final int id;
+  final String id;
   @override
   @JsonKey()
-  final int tenantId;
+  final String tenantId;
   @override
   final String? logoUrl;
   @override
@@ -640,8 +640,8 @@ abstract mixin class _$BrandingConfigCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      int tenantId,
+      {String id,
+      String tenantId,
       String? logoUrl,
       String? faviconUrl,
       String primaryColor,
@@ -692,11 +692,11 @@ class __$BrandingConfigCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       tenantId: null == tenantId
           ? _self.tenantId
           : tenantId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       logoUrl: freezed == logoUrl
           ? _self.logoUrl
           : logoUrl // ignore: cast_nullable_to_non_nullable
@@ -759,11 +759,13 @@ class __$BrandingConfigCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$Content {
-  int get id;
+  String get id;
   String get title;
-  String get slug;
   String get type;
-  String get accessTier;
+  String?
+      get slug; // Backend field is `monetizationModel` (free|avod|svod|tvod); exposed here as accessTier.
+  @JsonKey(name: 'monetizationModel')
+  String? get accessTier;
   String? get description;
   String? get shortDescription;
   String? get thumbnailUrl;
@@ -774,13 +776,15 @@ mixin _$Content {
   String? get trailerVideoId;
   int? get releaseYear;
   int? get durationSeconds;
-  String? get contentRating;
+  @JsonKey(name: 'ageRating')
+  String? get contentRating; // backend sends ageRating
   String? get status;
   double? get averageRating;
   int? get totalRatings;
   int? get totalViews;
   bool? get isFeatured;
   bool? get isTrending;
+  @JsonKey(name: 'isNew')
   bool? get isNewRelease;
   bool? get isOriginal;
   String? get languageName;
@@ -792,7 +796,7 @@ mixin _$Content {
   List<AudioTrack>? get audioTracks;
   WatchProgress? get watchProgress;
   bool? get isInWatchlist;
-  String? get userRating;
+  double? get userRating;
   double? get imdbRating;
   String? get imdbId;
 
@@ -813,8 +817,8 @@ mixin _$Content {
             other is Content &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.slug, slug) || other.slug == slug) &&
             (identical(other.type, type) || other.type == type) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
             (identical(other.accessTier, accessTier) ||
                 other.accessTier == accessTier) &&
             (identical(other.description, description) ||
@@ -882,8 +886,8 @@ mixin _$Content {
         runtimeType,
         id,
         title,
-        slug,
         type,
+        slug,
         accessTier,
         description,
         shortDescription,
@@ -920,7 +924,7 @@ mixin _$Content {
 
   @override
   String toString() {
-    return 'Content(id: $id, title: $title, slug: $slug, type: $type, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
+    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
   }
 }
 
@@ -930,11 +934,11 @@ abstract mixin class $ContentCopyWith<$Res> {
       _$ContentCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
-      String slug,
       String type,
-      String accessTier,
+      String? slug,
+      @JsonKey(name: 'monetizationModel') String? accessTier,
       String? description,
       String? shortDescription,
       String? thumbnailUrl,
@@ -945,14 +949,14 @@ abstract mixin class $ContentCopyWith<$Res> {
       String? trailerVideoId,
       int? releaseYear,
       int? durationSeconds,
-      String? contentRating,
+      @JsonKey(name: 'ageRating') String? contentRating,
       String? status,
       double? averageRating,
       int? totalRatings,
       int? totalViews,
       bool? isFeatured,
       bool? isTrending,
-      bool? isNewRelease,
+      @JsonKey(name: 'isNew') bool? isNewRelease,
       bool? isOriginal,
       String? languageName,
       List<String>? genres,
@@ -963,7 +967,7 @@ abstract mixin class $ContentCopyWith<$Res> {
       List<AudioTrack>? audioTracks,
       WatchProgress? watchProgress,
       bool? isInWatchlist,
-      String? userRating,
+      double? userRating,
       double? imdbRating,
       String? imdbId});
 
@@ -986,9 +990,9 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = null,
-    Object? slug = null,
     Object? type = null,
-    Object? accessTier = null,
+    Object? slug = freezed,
+    Object? accessTier = freezed,
     Object? description = freezed,
     Object? shortDescription = freezed,
     Object? thumbnailUrl = freezed,
@@ -1025,23 +1029,23 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _self.slug
-          : slug // ignore: cast_nullable_to_non_nullable
               as String,
       type: null == type
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
-      accessTier: null == accessTier
+      slug: freezed == slug
+          ? _self.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      accessTier: freezed == accessTier
           ? _self.accessTier
           : accessTier // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -1157,7 +1161,7 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
       userRating: freezed == userRating
           ? _self.userRating
           : userRating // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as double?,
       imdbRating: freezed == imdbRating
           ? _self.imdbRating
           : imdbRating // ignore: cast_nullable_to_non_nullable
@@ -1306,11 +1310,11 @@ extension ContentPatterns on Content {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String title,
-            String slug,
             String type,
-            String accessTier,
+            String? slug,
+            @JsonKey(name: 'monetizationModel') String? accessTier,
             String? description,
             String? shortDescription,
             String? thumbnailUrl,
@@ -1321,14 +1325,14 @@ extension ContentPatterns on Content {
             String? trailerVideoId,
             int? releaseYear,
             int? durationSeconds,
-            String? contentRating,
+            @JsonKey(name: 'ageRating') String? contentRating,
             String? status,
             double? averageRating,
             int? totalRatings,
             int? totalViews,
             bool? isFeatured,
             bool? isTrending,
-            bool? isNewRelease,
+            @JsonKey(name: 'isNew') bool? isNewRelease,
             bool? isOriginal,
             String? languageName,
             List<String>? genres,
@@ -1339,7 +1343,7 @@ extension ContentPatterns on Content {
             List<AudioTrack>? audioTracks,
             WatchProgress? watchProgress,
             bool? isInWatchlist,
-            String? userRating,
+            double? userRating,
             double? imdbRating,
             String? imdbId)?
         $default, {
@@ -1351,8 +1355,8 @@ extension ContentPatterns on Content {
         return $default(
             _that.id,
             _that.title,
-            _that.slug,
             _that.type,
+            _that.slug,
             _that.accessTier,
             _that.description,
             _that.shortDescription,
@@ -1406,11 +1410,11 @@ extension ContentPatterns on Content {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String title,
-            String slug,
             String type,
-            String accessTier,
+            String? slug,
+            @JsonKey(name: 'monetizationModel') String? accessTier,
             String? description,
             String? shortDescription,
             String? thumbnailUrl,
@@ -1421,14 +1425,14 @@ extension ContentPatterns on Content {
             String? trailerVideoId,
             int? releaseYear,
             int? durationSeconds,
-            String? contentRating,
+            @JsonKey(name: 'ageRating') String? contentRating,
             String? status,
             double? averageRating,
             int? totalRatings,
             int? totalViews,
             bool? isFeatured,
             bool? isTrending,
-            bool? isNewRelease,
+            @JsonKey(name: 'isNew') bool? isNewRelease,
             bool? isOriginal,
             String? languageName,
             List<String>? genres,
@@ -1439,7 +1443,7 @@ extension ContentPatterns on Content {
             List<AudioTrack>? audioTracks,
             WatchProgress? watchProgress,
             bool? isInWatchlist,
-            String? userRating,
+            double? userRating,
             double? imdbRating,
             String? imdbId)
         $default,
@@ -1450,8 +1454,8 @@ extension ContentPatterns on Content {
         return $default(
             _that.id,
             _that.title,
-            _that.slug,
             _that.type,
+            _that.slug,
             _that.accessTier,
             _that.description,
             _that.shortDescription,
@@ -1504,11 +1508,11 @@ extension ContentPatterns on Content {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String title,
-            String slug,
             String type,
-            String accessTier,
+            String? slug,
+            @JsonKey(name: 'monetizationModel') String? accessTier,
             String? description,
             String? shortDescription,
             String? thumbnailUrl,
@@ -1519,14 +1523,14 @@ extension ContentPatterns on Content {
             String? trailerVideoId,
             int? releaseYear,
             int? durationSeconds,
-            String? contentRating,
+            @JsonKey(name: 'ageRating') String? contentRating,
             String? status,
             double? averageRating,
             int? totalRatings,
             int? totalViews,
             bool? isFeatured,
             bool? isTrending,
-            bool? isNewRelease,
+            @JsonKey(name: 'isNew') bool? isNewRelease,
             bool? isOriginal,
             String? languageName,
             List<String>? genres,
@@ -1537,7 +1541,7 @@ extension ContentPatterns on Content {
             List<AudioTrack>? audioTracks,
             WatchProgress? watchProgress,
             bool? isInWatchlist,
-            String? userRating,
+            double? userRating,
             double? imdbRating,
             String? imdbId)?
         $default,
@@ -1548,8 +1552,8 @@ extension ContentPatterns on Content {
         return $default(
             _that.id,
             _that.title,
-            _that.slug,
             _that.type,
+            _that.slug,
             _that.accessTier,
             _that.description,
             _that.shortDescription,
@@ -1594,9 +1598,9 @@ class _Content implements Content {
   const _Content(
       {required this.id,
       required this.title,
-      required this.slug,
-      required this.type,
-      required this.accessTier,
+      this.type = 'movie',
+      this.slug,
+      @JsonKey(name: 'monetizationModel') this.accessTier,
       this.description,
       this.shortDescription,
       this.thumbnailUrl,
@@ -1607,14 +1611,14 @@ class _Content implements Content {
       this.trailerVideoId,
       this.releaseYear,
       this.durationSeconds,
-      this.contentRating,
+      @JsonKey(name: 'ageRating') this.contentRating,
       this.status,
       this.averageRating,
       this.totalRatings,
       this.totalViews,
       this.isFeatured,
       this.isTrending,
-      this.isNewRelease,
+      @JsonKey(name: 'isNew') this.isNewRelease,
       this.isOriginal,
       this.languageName,
       final List<String>? genres,
@@ -1636,15 +1640,18 @@ class _Content implements Content {
       _$ContentFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String title;
   @override
-  final String slug;
-  @override
+  @JsonKey()
   final String type;
   @override
-  final String accessTier;
+  final String? slug;
+// Backend field is `monetizationModel` (free|avod|svod|tvod); exposed here as accessTier.
+  @override
+  @JsonKey(name: 'monetizationModel')
+  final String? accessTier;
   @override
   final String? description;
   @override
@@ -1666,7 +1673,9 @@ class _Content implements Content {
   @override
   final int? durationSeconds;
   @override
+  @JsonKey(name: 'ageRating')
   final String? contentRating;
+// backend sends ageRating
   @override
   final String? status;
   @override
@@ -1680,6 +1689,7 @@ class _Content implements Content {
   @override
   final bool? isTrending;
   @override
+  @JsonKey(name: 'isNew')
   final bool? isNewRelease;
   @override
   final bool? isOriginal;
@@ -1734,7 +1744,7 @@ class _Content implements Content {
   @override
   final bool? isInWatchlist;
   @override
-  final String? userRating;
+  final double? userRating;
   @override
   final double? imdbRating;
   @override
@@ -1762,8 +1772,8 @@ class _Content implements Content {
             other is _Content &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.slug, slug) || other.slug == slug) &&
             (identical(other.type, type) || other.type == type) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
             (identical(other.accessTier, accessTier) ||
                 other.accessTier == accessTier) &&
             (identical(other.description, description) ||
@@ -1832,8 +1842,8 @@ class _Content implements Content {
         runtimeType,
         id,
         title,
-        slug,
         type,
+        slug,
         accessTier,
         description,
         shortDescription,
@@ -1870,7 +1880,7 @@ class _Content implements Content {
 
   @override
   String toString() {
-    return 'Content(id: $id, title: $title, slug: $slug, type: $type, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
+    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
   }
 }
 
@@ -1881,11 +1891,11 @@ abstract mixin class _$ContentCopyWith<$Res> implements $ContentCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
-      String slug,
       String type,
-      String accessTier,
+      String? slug,
+      @JsonKey(name: 'monetizationModel') String? accessTier,
       String? description,
       String? shortDescription,
       String? thumbnailUrl,
@@ -1896,14 +1906,14 @@ abstract mixin class _$ContentCopyWith<$Res> implements $ContentCopyWith<$Res> {
       String? trailerVideoId,
       int? releaseYear,
       int? durationSeconds,
-      String? contentRating,
+      @JsonKey(name: 'ageRating') String? contentRating,
       String? status,
       double? averageRating,
       int? totalRatings,
       int? totalViews,
       bool? isFeatured,
       bool? isTrending,
-      bool? isNewRelease,
+      @JsonKey(name: 'isNew') bool? isNewRelease,
       bool? isOriginal,
       String? languageName,
       List<String>? genres,
@@ -1914,7 +1924,7 @@ abstract mixin class _$ContentCopyWith<$Res> implements $ContentCopyWith<$Res> {
       List<AudioTrack>? audioTracks,
       WatchProgress? watchProgress,
       bool? isInWatchlist,
-      String? userRating,
+      double? userRating,
       double? imdbRating,
       String? imdbId});
 
@@ -1940,9 +1950,9 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = null,
-    Object? slug = null,
     Object? type = null,
-    Object? accessTier = null,
+    Object? slug = freezed,
+    Object? accessTier = freezed,
     Object? description = freezed,
     Object? shortDescription = freezed,
     Object? thumbnailUrl = freezed,
@@ -1979,23 +1989,23 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _self.slug
-          : slug // ignore: cast_nullable_to_non_nullable
               as String,
       type: null == type
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
-      accessTier: null == accessTier
+      slug: freezed == slug
+          ? _self.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      accessTier: freezed == accessTier
           ? _self.accessTier
           : accessTier // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -2111,7 +2121,7 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
       userRating: freezed == userRating
           ? _self.userRating
           : userRating // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as double?,
       imdbRating: freezed == imdbRating
           ? _self.imdbRating
           : imdbRating // ignore: cast_nullable_to_non_nullable
@@ -2168,7 +2178,7 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
 
 /// @nodoc
 mixin _$CastMember {
-  int get id;
+  String get id;
   String get personName;
   String get role;
   String? get characterName;
@@ -2220,7 +2230,7 @@ abstract mixin class $CastMemberCopyWith<$Res> {
       _$CastMemberCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String personName,
       String role,
       String? characterName,
@@ -2251,7 +2261,7 @@ class _$CastMemberCopyWithImpl<$Res> implements $CastMemberCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       personName: null == personName
           ? _self.personName
           : personName // ignore: cast_nullable_to_non_nullable
@@ -2369,7 +2379,7 @@ extension CastMemberPatterns on CastMember {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int id, String personName, String role,
+    TResult Function(String id, String personName, String role,
             String? characterName, String? photoUrl, int? sortOrder)?
         $default, {
     required TResult orElse(),
@@ -2399,7 +2409,7 @@ extension CastMemberPatterns on CastMember {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int id, String personName, String role,
+    TResult Function(String id, String personName, String role,
             String? characterName, String? photoUrl, int? sortOrder)
         $default,
   ) {
@@ -2427,7 +2437,7 @@ extension CastMemberPatterns on CastMember {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int id, String personName, String role,
+    TResult? Function(String id, String personName, String role,
             String? characterName, String? photoUrl, int? sortOrder)?
         $default,
   ) {
@@ -2456,7 +2466,7 @@ class _CastMember implements CastMember {
       _$CastMemberFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String personName;
   @override
@@ -2520,7 +2530,7 @@ abstract mixin class _$CastMemberCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String personName,
       String role,
       String? characterName,
@@ -2551,7 +2561,7 @@ class __$CastMemberCopyWithImpl<$Res> implements _$CastMemberCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       personName: null == personName
           ? _self.personName
           : personName // ignore: cast_nullable_to_non_nullable
@@ -2578,7 +2588,7 @@ class __$CastMemberCopyWithImpl<$Res> implements _$CastMemberCopyWith<$Res> {
 
 /// @nodoc
 mixin _$SeriesInfo {
-  int get seriesId;
+  String get seriesId;
   int get totalSeasons;
   int get totalEpisodes;
   String get status;
@@ -2627,7 +2637,7 @@ abstract mixin class $SeriesInfoCopyWith<$Res> {
       _$SeriesInfoCopyWithImpl;
   @useResult
   $Res call(
-      {int seriesId,
+      {String seriesId,
       int totalSeasons,
       int totalEpisodes,
       String status,
@@ -2656,7 +2666,7 @@ class _$SeriesInfoCopyWithImpl<$Res> implements $SeriesInfoCopyWith<$Res> {
       seriesId: null == seriesId
           ? _self.seriesId
           : seriesId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       totalSeasons: null == totalSeasons
           ? _self.totalSeasons
           : totalSeasons // ignore: cast_nullable_to_non_nullable
@@ -2770,7 +2780,7 @@ extension SeriesInfoPatterns on SeriesInfo {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int seriesId, int totalSeasons, int totalEpisodes,
+    TResult Function(String seriesId, int totalSeasons, int totalEpisodes,
             String status, List<Season>? seasons)?
         $default, {
     required TResult orElse(),
@@ -2800,7 +2810,7 @@ extension SeriesInfoPatterns on SeriesInfo {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int seriesId, int totalSeasons, int totalEpisodes,
+    TResult Function(String seriesId, int totalSeasons, int totalEpisodes,
             String status, List<Season>? seasons)
         $default,
   ) {
@@ -2828,7 +2838,7 @@ extension SeriesInfoPatterns on SeriesInfo {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int seriesId, int totalSeasons, int totalEpisodes,
+    TResult? Function(String seriesId, int totalSeasons, int totalEpisodes,
             String status, List<Season>? seasons)?
         $default,
   ) {
@@ -2857,7 +2867,7 @@ class _SeriesInfo implements SeriesInfo {
       _$SeriesInfoFromJson(json);
 
   @override
-  final int seriesId;
+  final String seriesId;
   @override
   final int totalSeasons;
   @override
@@ -2924,7 +2934,7 @@ abstract mixin class _$SeriesInfoCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int seriesId,
+      {String seriesId,
       int totalSeasons,
       int totalEpisodes,
       String status,
@@ -2953,7 +2963,7 @@ class __$SeriesInfoCopyWithImpl<$Res> implements _$SeriesInfoCopyWith<$Res> {
       seriesId: null == seriesId
           ? _self.seriesId
           : seriesId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       totalSeasons: null == totalSeasons
           ? _self.totalSeasons
           : totalSeasons // ignore: cast_nullable_to_non_nullable
@@ -2976,7 +2986,7 @@ class __$SeriesInfoCopyWithImpl<$Res> implements _$SeriesInfoCopyWith<$Res> {
 
 /// @nodoc
 mixin _$Season {
-  int get id;
+  String get id;
   int get seasonNumber;
   String? get title;
   int? get year;
@@ -3025,7 +3035,7 @@ abstract mixin class $SeasonCopyWith<$Res> {
       _$SeasonCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       int seasonNumber,
       String? title,
       int? year,
@@ -3056,7 +3066,7 @@ class _$SeasonCopyWithImpl<$Res> implements $SeasonCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       seasonNumber: null == seasonNumber
           ? _self.seasonNumber
           : seasonNumber // ignore: cast_nullable_to_non_nullable
@@ -3174,7 +3184,7 @@ extension SeasonPatterns on Season {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int id, int seasonNumber, String? title, int? year,
+    TResult Function(String id, int seasonNumber, String? title, int? year,
             int? episodeCount, List<Episode>? episodes)?
         $default, {
     required TResult orElse(),
@@ -3204,7 +3214,7 @@ extension SeasonPatterns on Season {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int id, int seasonNumber, String? title, int? year,
+    TResult Function(String id, int seasonNumber, String? title, int? year,
             int? episodeCount, List<Episode>? episodes)
         $default,
   ) {
@@ -3232,7 +3242,7 @@ extension SeasonPatterns on Season {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int id, int seasonNumber, String? title, int? year,
+    TResult? Function(String id, int seasonNumber, String? title, int? year,
             int? episodeCount, List<Episode>? episodes)?
         $default,
   ) {
@@ -3261,7 +3271,7 @@ class _Season implements Season {
   factory _Season.fromJson(Map<String, dynamic> json) => _$SeasonFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final int seasonNumber;
   @override
@@ -3328,7 +3338,7 @@ abstract mixin class _$SeasonCopyWith<$Res> implements $SeasonCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       int seasonNumber,
       String? title,
       int? year,
@@ -3359,7 +3369,7 @@ class __$SeasonCopyWithImpl<$Res> implements _$SeasonCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       seasonNumber: null == seasonNumber
           ? _self.seasonNumber
           : seasonNumber // ignore: cast_nullable_to_non_nullable
@@ -3386,13 +3396,13 @@ class __$SeasonCopyWithImpl<$Res> implements _$SeasonCopyWith<$Res> {
 
 /// @nodoc
 mixin _$Episode {
-  int get id;
+  String get id;
   int get episodeNumber;
   String get title;
   String? get description;
   int? get durationSeconds;
   String? get thumbnailUrl;
-  int? get contentId;
+  String? get contentId;
   WatchProgress? get watchProgress;
 
   /// Create a copy of Episode
@@ -3443,13 +3453,13 @@ abstract mixin class $EpisodeCopyWith<$Res> {
       _$EpisodeCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       int episodeNumber,
       String title,
       String? description,
       int? durationSeconds,
       String? thumbnailUrl,
-      int? contentId,
+      String? contentId,
       WatchProgress? watchProgress});
 
   $WatchProgressCopyWith<$Res>? get watchProgress;
@@ -3480,7 +3490,7 @@ class _$EpisodeCopyWithImpl<$Res> implements $EpisodeCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       episodeNumber: null == episodeNumber
           ? _self.episodeNumber
           : episodeNumber // ignore: cast_nullable_to_non_nullable
@@ -3504,7 +3514,7 @@ class _$EpisodeCopyWithImpl<$Res> implements $EpisodeCopyWith<$Res> {
       contentId: freezed == contentId
           ? _self.contentId
           : contentId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as String?,
       watchProgress: freezed == watchProgress
           ? _self.watchProgress
           : watchProgress // ignore: cast_nullable_to_non_nullable
@@ -3621,13 +3631,13 @@ extension EpisodePatterns on Episode {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             int episodeNumber,
             String title,
             String? description,
             int? durationSeconds,
             String? thumbnailUrl,
-            int? contentId,
+            String? contentId,
             WatchProgress? watchProgress)?
         $default, {
     required TResult orElse(),
@@ -3665,13 +3675,13 @@ extension EpisodePatterns on Episode {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             int episodeNumber,
             String title,
             String? description,
             int? durationSeconds,
             String? thumbnailUrl,
-            int? contentId,
+            String? contentId,
             WatchProgress? watchProgress)
         $default,
   ) {
@@ -3707,13 +3717,13 @@ extension EpisodePatterns on Episode {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             int episodeNumber,
             String title,
             String? description,
             int? durationSeconds,
             String? thumbnailUrl,
-            int? contentId,
+            String? contentId,
             WatchProgress? watchProgress)?
         $default,
   ) {
@@ -3751,7 +3761,7 @@ class _Episode implements Episode {
       _$EpisodeFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final int episodeNumber;
   @override
@@ -3763,7 +3773,7 @@ class _Episode implements Episode {
   @override
   final String? thumbnailUrl;
   @override
-  final int? contentId;
+  final String? contentId;
   @override
   final WatchProgress? watchProgress;
 
@@ -3821,13 +3831,13 @@ abstract mixin class _$EpisodeCopyWith<$Res> implements $EpisodeCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       int episodeNumber,
       String title,
       String? description,
       int? durationSeconds,
       String? thumbnailUrl,
-      int? contentId,
+      String? contentId,
       WatchProgress? watchProgress});
 
   @override
@@ -3859,7 +3869,7 @@ class __$EpisodeCopyWithImpl<$Res> implements _$EpisodeCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       episodeNumber: null == episodeNumber
           ? _self.episodeNumber
           : episodeNumber // ignore: cast_nullable_to_non_nullable
@@ -3883,7 +3893,7 @@ class __$EpisodeCopyWithImpl<$Res> implements _$EpisodeCopyWith<$Res> {
       contentId: freezed == contentId
           ? _self.contentId
           : contentId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as String?,
       watchProgress: freezed == watchProgress
           ? _self.watchProgress
           : watchProgress // ignore: cast_nullable_to_non_nullable
@@ -3908,7 +3918,7 @@ class __$EpisodeCopyWithImpl<$Res> implements _$EpisodeCopyWith<$Res> {
 
 /// @nodoc
 mixin _$VideoAsset {
-  int get id;
+  String get id;
   String get playerType;
   String get status;
   String? get hlsManifestUrl;
@@ -3969,7 +3979,7 @@ abstract mixin class $VideoAssetCopyWith<$Res> {
       _$VideoAssetCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String playerType,
       String status,
       String? hlsManifestUrl,
@@ -4002,7 +4012,7 @@ class _$VideoAssetCopyWithImpl<$Res> implements $VideoAssetCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       playerType: null == playerType
           ? _self.playerType
           : playerType // ignore: cast_nullable_to_non_nullable
@@ -4125,7 +4135,7 @@ extension VideoAssetPatterns on VideoAsset {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String playerType,
             String status,
             String? hlsManifestUrl,
@@ -4167,7 +4177,7 @@ extension VideoAssetPatterns on VideoAsset {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String playerType,
             String status,
             String? hlsManifestUrl,
@@ -4207,7 +4217,7 @@ extension VideoAssetPatterns on VideoAsset {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String playerType,
             String status,
             String? hlsManifestUrl,
@@ -4249,7 +4259,7 @@ class _VideoAsset implements VideoAsset {
       _$VideoAssetFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String playerType;
   @override
@@ -4331,7 +4341,7 @@ abstract mixin class _$VideoAssetCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String playerType,
       String status,
       String? hlsManifestUrl,
@@ -4364,7 +4374,7 @@ class __$VideoAssetCopyWithImpl<$Res> implements _$VideoAssetCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       playerType: null == playerType
           ? _self.playerType
           : playerType // ignore: cast_nullable_to_non_nullable
@@ -4728,7 +4738,7 @@ class __$VideoQualityCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$Subtitle {
-  int get id;
+  String get id;
   String get languageCode;
   String get label;
   String get format;
@@ -4777,7 +4787,7 @@ abstract mixin class $SubtitleCopyWith<$Res> {
       _$SubtitleCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String languageCode,
       String label,
       String format,
@@ -4808,7 +4818,7 @@ class _$SubtitleCopyWithImpl<$Res> implements $SubtitleCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       languageCode: null == languageCode
           ? _self.languageCode
           : languageCode // ignore: cast_nullable_to_non_nullable
@@ -4926,8 +4936,8 @@ extension SubtitlePatterns on Subtitle {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int id, String languageCode, String label, String format,
-            String s3Url, bool? isDefault)?
+    TResult Function(String id, String languageCode, String label,
+            String format, String s3Url, bool? isDefault)?
         $default, {
     required TResult orElse(),
   }) {
@@ -4956,8 +4966,8 @@ extension SubtitlePatterns on Subtitle {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int id, String languageCode, String label, String format,
-            String s3Url, bool? isDefault)
+    TResult Function(String id, String languageCode, String label,
+            String format, String s3Url, bool? isDefault)
         $default,
   ) {
     final _that = this;
@@ -4984,8 +4994,8 @@ extension SubtitlePatterns on Subtitle {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int id, String languageCode, String label, String format,
-            String s3Url, bool? isDefault)?
+    TResult? Function(String id, String languageCode, String label,
+            String format, String s3Url, bool? isDefault)?
         $default,
   ) {
     final _that = this;
@@ -5013,7 +5023,7 @@ class _Subtitle implements Subtitle {
       _$SubtitleFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String languageCode;
   @override
@@ -5074,7 +5084,7 @@ abstract mixin class _$SubtitleCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String languageCode,
       String label,
       String format,
@@ -5105,7 +5115,7 @@ class __$SubtitleCopyWithImpl<$Res> implements _$SubtitleCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       languageCode: null == languageCode
           ? _self.languageCode
           : languageCode // ignore: cast_nullable_to_non_nullable
@@ -5132,7 +5142,7 @@ class __$SubtitleCopyWithImpl<$Res> implements _$SubtitleCopyWith<$Res> {
 
 /// @nodoc
 mixin _$AudioTrack {
-  int get id;
+  String get id;
   String get languageCode;
   String get label;
   int get trackIndex;
@@ -5181,7 +5191,7 @@ abstract mixin class $AudioTrackCopyWith<$Res> {
       _$AudioTrackCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String languageCode,
       String label,
       int trackIndex,
@@ -5210,7 +5220,7 @@ class _$AudioTrackCopyWithImpl<$Res> implements $AudioTrackCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       languageCode: null == languageCode
           ? _self.languageCode
           : languageCode // ignore: cast_nullable_to_non_nullable
@@ -5324,8 +5334,8 @@ extension AudioTrackPatterns on AudioTrack {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int id, String languageCode, String label, int trackIndex,
-            bool? isDefault)?
+    TResult Function(String id, String languageCode, String label,
+            int trackIndex, bool? isDefault)?
         $default, {
     required TResult orElse(),
   }) {
@@ -5354,8 +5364,8 @@ extension AudioTrackPatterns on AudioTrack {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int id, String languageCode, String label, int trackIndex,
-            bool? isDefault)
+    TResult Function(String id, String languageCode, String label,
+            int trackIndex, bool? isDefault)
         $default,
   ) {
     final _that = this;
@@ -5382,8 +5392,8 @@ extension AudioTrackPatterns on AudioTrack {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int id, String languageCode, String label, int trackIndex,
-            bool? isDefault)?
+    TResult? Function(String id, String languageCode, String label,
+            int trackIndex, bool? isDefault)?
         $default,
   ) {
     final _that = this;
@@ -5410,7 +5420,7 @@ class _AudioTrack implements AudioTrack {
       _$AudioTrackFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String languageCode;
   @override
@@ -5470,7 +5480,7 @@ abstract mixin class _$AudioTrackCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String languageCode,
       String label,
       int trackIndex,
@@ -5499,7 +5509,7 @@ class __$AudioTrackCopyWithImpl<$Res> implements _$AudioTrackCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       languageCode: null == languageCode
           ? _self.languageCode
           : languageCode // ignore: cast_nullable_to_non_nullable
@@ -5919,7 +5929,7 @@ class __$WatchProgressCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$LiveStream {
-  int get id;
+  String get id;
   String get title;
   String get status;
   String get streamType;
@@ -6020,7 +6030,7 @@ abstract mixin class $LiveStreamCopyWith<$Res> {
       _$LiveStreamCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
       String status,
       String streamType,
@@ -6073,7 +6083,7 @@ class _$LiveStreamCopyWithImpl<$Res> implements $LiveStreamCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -6236,7 +6246,7 @@ extension LiveStreamPatterns on LiveStream {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String title,
             String status,
             String streamType,
@@ -6298,7 +6308,7 @@ extension LiveStreamPatterns on LiveStream {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String title,
             String status,
             String streamType,
@@ -6358,7 +6368,7 @@ extension LiveStreamPatterns on LiveStream {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String title,
             String status,
             String streamType,
@@ -6429,7 +6439,7 @@ class _LiveStream implements LiveStream {
       _$LiveStreamFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String title;
   @override
@@ -6553,7 +6563,7 @@ abstract mixin class _$LiveStreamCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
       String status,
       String streamType,
@@ -6606,7 +6616,7 @@ class __$LiveStreamCopyWithImpl<$Res> implements _$LiveStreamCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -6677,7 +6687,7 @@ class __$LiveStreamCopyWithImpl<$Res> implements _$LiveStreamCopyWith<$Res> {
 
 /// @nodoc
 mixin _$SubscriptionPlan {
-  int get id;
+  String get id;
   String get name;
   double get price;
   String get currency;
@@ -6761,7 +6771,7 @@ abstract mixin class $SubscriptionPlanCopyWith<$Res> {
       _$SubscriptionPlanCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String name,
       double price,
       String currency,
@@ -6807,7 +6817,7 @@ class _$SubscriptionPlanCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -6954,7 +6964,7 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String name,
             double price,
             String currency,
@@ -7008,7 +7018,7 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String name,
             double price,
             String currency,
@@ -7060,7 +7070,7 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String name,
             double price,
             String currency,
@@ -7120,7 +7130,7 @@ class _SubscriptionPlan implements SubscriptionPlan {
       _$SubscriptionPlanFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String name;
   @override
@@ -7230,7 +7240,7 @@ abstract mixin class _$SubscriptionPlanCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String name,
       double price,
       String currency,
@@ -7276,7 +7286,7 @@ class __$SubscriptionPlanCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -7331,7 +7341,7 @@ class __$SubscriptionPlanCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$UserSubscription {
-  int get id;
+  String get id;
   SubscriptionPlan get plan;
   String get status;
   DateTime get startDate;
@@ -7385,7 +7395,7 @@ abstract mixin class $UserSubscriptionCopyWith<$Res> {
       _$UserSubscriptionCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       SubscriptionPlan plan,
       String status,
       DateTime startDate,
@@ -7421,7 +7431,7 @@ class _$UserSubscriptionCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       plan: null == plan
           ? _self.plan
           : plan // ignore: cast_nullable_to_non_nullable
@@ -7554,7 +7564,7 @@ extension UserSubscriptionPatterns on UserSubscription {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             SubscriptionPlan plan,
             String status,
             DateTime startDate,
@@ -7590,7 +7600,7 @@ extension UserSubscriptionPatterns on UserSubscription {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             SubscriptionPlan plan,
             String status,
             DateTime startDate,
@@ -7624,7 +7634,7 @@ extension UserSubscriptionPatterns on UserSubscription {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             SubscriptionPlan plan,
             String status,
             DateTime startDate,
@@ -7659,7 +7669,7 @@ class _UserSubscription implements UserSubscription {
       _$UserSubscriptionFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final SubscriptionPlan plan;
   @override
@@ -7725,7 +7735,7 @@ abstract mixin class _$UserSubscriptionCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       SubscriptionPlan plan,
       String status,
       DateTime startDate,
@@ -7762,7 +7772,7 @@ class __$UserSubscriptionCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       plan: null == plan
           ? _self.plan
           : plan // ignore: cast_nullable_to_non_nullable
@@ -7803,7 +7813,7 @@ class __$UserSubscriptionCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$UserProfile {
-  int get id;
+  String get id;
   String get displayName;
   String? get avatarUrl;
   String? get avatarColor;
@@ -7873,7 +7883,7 @@ abstract mixin class $UserProfileCopyWith<$Res> {
       _$UserProfileCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String displayName,
       String? avatarUrl,
       String? avatarColor,
@@ -7910,7 +7920,7 @@ class _$UserProfileCopyWithImpl<$Res> implements $UserProfileCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       displayName: null == displayName
           ? _self.displayName
           : displayName // ignore: cast_nullable_to_non_nullable
@@ -8041,7 +8051,7 @@ extension UserProfilePatterns on UserProfile {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String displayName,
             String? avatarUrl,
             String? avatarColor,
@@ -8087,7 +8097,7 @@ extension UserProfilePatterns on UserProfile {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String displayName,
             String? avatarUrl,
             String? avatarColor,
@@ -8131,7 +8141,7 @@ extension UserProfilePatterns on UserProfile {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String displayName,
             String? avatarUrl,
             String? avatarColor,
@@ -8178,7 +8188,7 @@ class _UserProfile implements UserProfile {
       _$UserProfileFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String displayName;
   @override
@@ -8263,7 +8273,7 @@ abstract mixin class _$UserProfileCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String displayName,
       String? avatarUrl,
       String? avatarColor,
@@ -8300,7 +8310,7 @@ class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       displayName: null == displayName
           ? _self.displayName
           : displayName // ignore: cast_nullable_to_non_nullable
@@ -8339,7 +8349,7 @@ class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
 
 /// @nodoc
 mixin _$Banner {
-  int get id;
+  String get id;
   String? get title;
   String? get subtitle;
   String get imageUrl;
@@ -8399,7 +8409,7 @@ abstract mixin class $BannerCopyWith<$Res> {
       _$BannerCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String? title,
       String? subtitle,
       String imageUrl,
@@ -8436,7 +8446,7 @@ class _$BannerCopyWithImpl<$Res> implements $BannerCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: freezed == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -8567,7 +8577,7 @@ extension BannerPatterns on Banner {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String? title,
             String? subtitle,
             String imageUrl,
@@ -8613,7 +8623,7 @@ extension BannerPatterns on Banner {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String? title,
             String? subtitle,
             String imageUrl,
@@ -8657,7 +8667,7 @@ extension BannerPatterns on Banner {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String? title,
             String? subtitle,
             String imageUrl,
@@ -8703,7 +8713,7 @@ class _Banner implements Banner {
   factory _Banner.fromJson(Map<String, dynamic> json) => _$BannerFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String? title;
   @override
@@ -8777,7 +8787,7 @@ abstract mixin class _$BannerCopyWith<$Res> implements $BannerCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String? title,
       String? subtitle,
       String imageUrl,
@@ -8814,7 +8824,7 @@ class __$BannerCopyWithImpl<$Res> implements _$BannerCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: freezed == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -8853,7 +8863,7 @@ class __$BannerCopyWithImpl<$Res> implements _$BannerCopyWith<$Res> {
 
 /// @nodoc
 mixin _$ContentRow {
-  int get id;
+  String get id;
   String get title;
   String get rowType;
   List<Content> get items;
@@ -8900,7 +8910,7 @@ abstract mixin class $ContentRowCopyWith<$Res> {
       _$ContentRowCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
       String rowType,
       List<Content> items,
@@ -8929,7 +8939,7 @@ class _$ContentRowCopyWithImpl<$Res> implements $ContentRowCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -9043,8 +9053,8 @@ extension ContentRowPatterns on ContentRow {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int id, String title, String rowType, List<Content> items,
-            int? maxItems)?
+    TResult Function(String id, String title, String rowType,
+            List<Content> items, int? maxItems)?
         $default, {
     required TResult orElse(),
   }) {
@@ -9073,8 +9083,8 @@ extension ContentRowPatterns on ContentRow {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int id, String title, String rowType, List<Content> items,
-            int? maxItems)
+    TResult Function(String id, String title, String rowType,
+            List<Content> items, int? maxItems)
         $default,
   ) {
     final _that = this;
@@ -9101,8 +9111,8 @@ extension ContentRowPatterns on ContentRow {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int id, String title, String rowType, List<Content> items,
-            int? maxItems)?
+    TResult? Function(String id, String title, String rowType,
+            List<Content> items, int? maxItems)?
         $default,
   ) {
     final _that = this;
@@ -9130,7 +9140,7 @@ class _ContentRow implements ContentRow {
       _$ContentRowFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String title;
   @override
@@ -9194,7 +9204,7 @@ abstract mixin class _$ContentRowCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
       String rowType,
       List<Content> items,
@@ -9223,7 +9233,7 @@ class __$ContentRowCopyWithImpl<$Res> implements _$ContentRowCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -9246,7 +9256,7 @@ class __$ContentRowCopyWithImpl<$Res> implements _$ContentRowCopyWith<$Res> {
 
 /// @nodoc
 mixin _$AppNotification {
-  int get id;
+  String get id;
   String get title;
   String get body;
   String get type;
@@ -9302,7 +9312,7 @@ abstract mixin class $AppNotificationCopyWith<$Res> {
       _$AppNotificationCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
       String body,
       String type,
@@ -9338,7 +9348,7 @@ class _$AppNotificationCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -9465,7 +9475,7 @@ extension AppNotificationPatterns on AppNotification {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String title,
             String body,
             String type,
@@ -9502,7 +9512,7 @@ extension AppNotificationPatterns on AppNotification {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int id,
+            String id,
             String title,
             String body,
             String type,
@@ -9537,7 +9547,7 @@ extension AppNotificationPatterns on AppNotification {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int id,
+            String id,
             String title,
             String body,
             String type,
@@ -9574,7 +9584,7 @@ class _AppNotification implements AppNotification {
       _$AppNotificationFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
   final String title;
   @override
@@ -9643,7 +9653,7 @@ abstract mixin class _$AppNotificationCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
       String title,
       String body,
       String type,
@@ -9679,7 +9689,7 @@ class __$AppNotificationCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -9715,7 +9725,7 @@ class __$AppNotificationCopyWithImpl<$Res>
 /// @nodoc
 mixin _$WatchParty {
   String get code;
-  int get contentId;
+  String get contentId;
   String get status;
   bool get isPlaying;
   int get currentPosition;
@@ -9779,7 +9789,7 @@ abstract mixin class $WatchPartyCopyWith<$Res> {
   @useResult
   $Res call(
       {String code,
-      int contentId,
+      String contentId,
       String status,
       bool isPlaying,
       int currentPosition,
@@ -9817,7 +9827,7 @@ class _$WatchPartyCopyWithImpl<$Res> implements $WatchPartyCopyWith<$Res> {
       contentId: null == contentId
           ? _self.contentId
           : contentId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -9941,7 +9951,7 @@ extension WatchPartyPatterns on WatchParty {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             String code,
-            int contentId,
+            String contentId,
             String status,
             bool isPlaying,
             int currentPosition,
@@ -9985,7 +9995,7 @@ extension WatchPartyPatterns on WatchParty {
   TResult when<TResult extends Object?>(
     TResult Function(
             String code,
-            int contentId,
+            String contentId,
             String status,
             bool isPlaying,
             int currentPosition,
@@ -10027,7 +10037,7 @@ extension WatchPartyPatterns on WatchParty {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             String code,
-            int contentId,
+            String contentId,
             String status,
             bool isPlaying,
             int currentPosition,
@@ -10073,7 +10083,7 @@ class _WatchParty implements WatchParty {
   @override
   final String code;
   @override
-  final int contentId;
+  final String contentId;
   @override
   final String status;
   @override
@@ -10157,7 +10167,7 @@ abstract mixin class _$WatchPartyCopyWith<$Res>
   @useResult
   $Res call(
       {String code,
-      int contentId,
+      String contentId,
       String status,
       bool isPlaying,
       int currentPosition,
@@ -10195,7 +10205,7 @@ class __$WatchPartyCopyWithImpl<$Res> implements _$WatchPartyCopyWith<$Res> {
       contentId: null == contentId
           ? _self.contentId
           : contentId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -10226,7 +10236,7 @@ class __$WatchPartyCopyWithImpl<$Res> implements _$WatchPartyCopyWith<$Res> {
 
 /// @nodoc
 mixin _$WatchPartyMember {
-  int get userId;
+  String get userId;
   String get displayName;
   String? get avatarUrl;
   bool get isHost;
@@ -10272,7 +10282,8 @@ abstract mixin class $WatchPartyMemberCopyWith<$Res> {
           WatchPartyMember value, $Res Function(WatchPartyMember) _then) =
       _$WatchPartyMemberCopyWithImpl;
   @useResult
-  $Res call({int userId, String displayName, String? avatarUrl, bool isHost});
+  $Res call(
+      {String userId, String displayName, String? avatarUrl, bool isHost});
 }
 
 /// @nodoc
@@ -10297,7 +10308,7 @@ class _$WatchPartyMemberCopyWithImpl<$Res>
       userId: null == userId
           ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       displayName: null == displayName
           ? _self.displayName
           : displayName // ignore: cast_nullable_to_non_nullable
@@ -10408,7 +10419,7 @@ extension WatchPartyMemberPatterns on WatchPartyMember {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            int userId, String displayName, String? avatarUrl, bool isHost)?
+            String userId, String displayName, String? avatarUrl, bool isHost)?
         $default, {
     required TResult orElse(),
   }) {
@@ -10438,7 +10449,7 @@ extension WatchPartyMemberPatterns on WatchPartyMember {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            int userId, String displayName, String? avatarUrl, bool isHost)
+            String userId, String displayName, String? avatarUrl, bool isHost)
         $default,
   ) {
     final _that = this;
@@ -10466,7 +10477,7 @@ extension WatchPartyMemberPatterns on WatchPartyMember {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            int userId, String displayName, String? avatarUrl, bool isHost)?
+            String userId, String displayName, String? avatarUrl, bool isHost)?
         $default,
   ) {
     final _that = this;
@@ -10492,7 +10503,7 @@ class _WatchPartyMember implements WatchPartyMember {
       _$WatchPartyMemberFromJson(json);
 
   @override
-  final int userId;
+  final String userId;
   @override
   final String displayName;
   @override
@@ -10547,7 +10558,8 @@ abstract mixin class _$WatchPartyMemberCopyWith<$Res>
       __$WatchPartyMemberCopyWithImpl;
   @override
   @useResult
-  $Res call({int userId, String displayName, String? avatarUrl, bool isHost});
+  $Res call(
+      {String userId, String displayName, String? avatarUrl, bool isHost});
 }
 
 /// @nodoc
@@ -10572,7 +10584,7 @@ class __$WatchPartyMemberCopyWithImpl<$Res>
       userId: null == userId
           ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       displayName: null == displayName
           ? _self.displayName
           : displayName // ignore: cast_nullable_to_non_nullable

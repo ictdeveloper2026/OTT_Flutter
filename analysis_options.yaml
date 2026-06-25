@@ -14,6 +14,8 @@ analyzer:
   # repositories/DI) that were never wired together. The running app uses only
   # lib/main.dart and does NOT import them. They are excluded from analysis so the
   # Problems panel is clean; files remain on disk and can be ported in one by one.
+  # NOTE: the Path B migration (making this scaffold the product) is happening on the
+  # `path-b-migration` branch, where these excludes are progressively removed.
   exclude:
     - lib/core/di/**
     - lib/core/network/**

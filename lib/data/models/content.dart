@@ -9,8 +9,8 @@ abstract class BrandingConfig with _$BrandingConfig {
   const BrandingConfig._();
 
   const factory BrandingConfig({
-    @Default(0) int id,
-    @Default(0) int tenantId,
+    @Default('') String id,
+    @Default('') String tenantId,
     String? logoUrl,
     String? faviconUrl,
     @Default('#E50914') String primaryColor,
@@ -36,12 +36,15 @@ abstract class BrandingConfig with _$BrandingConfig {
 // ── Content ──
 @freezed
 abstract class Content with _$Content {
+  // Only id/title are guaranteed by the backend ContentListItemDto; everything else is optional
+  // so deserializing a lean list item (which omits most fields) never throws.
   const factory Content({
-    required int id,
+    required String id,
     required String title,
-    required String slug,
-    required String type,
-    required String accessTier,
+    @Default('movie') String type,
+    String? slug,
+    // Backend field is `monetizationModel` (free|avod|svod|tvod); exposed here as accessTier.
+    @JsonKey(name: 'monetizationModel') String? accessTier,
     String? description,
     String? shortDescription,
     String? thumbnailUrl,
@@ -52,14 +55,14 @@ abstract class Content with _$Content {
     String? trailerVideoId,
     int? releaseYear,
     int? durationSeconds,
-    String? contentRating,
+    @JsonKey(name: 'ageRating') String? contentRating, // backend sends ageRating
     String? status,
     double? averageRating,
     int? totalRatings,
     int? totalViews,
     bool? isFeatured,
     bool? isTrending,
-    bool? isNewRelease,
+    @JsonKey(name: 'isNew') bool? isNewRelease,
     bool? isOriginal,
     String? languageName,
     List<String>? genres,
@@ -70,7 +73,7 @@ abstract class Content with _$Content {
     List<AudioTrack>? audioTracks,
     WatchProgress? watchProgress,
     bool? isInWatchlist,
-    String? userRating,
+    double? userRating,
     double? imdbRating,
     String? imdbId,
   }) = _Content;
@@ -81,7 +84,7 @@ abstract class Content with _$Content {
 @freezed
 abstract class CastMember with _$CastMember {
   const factory CastMember({
-    required int id,
+    required String id,
     required String personName,
     required String role,
     String? characterName,
@@ -94,7 +97,7 @@ abstract class CastMember with _$CastMember {
 @freezed
 abstract class SeriesInfo with _$SeriesInfo {
   const factory SeriesInfo({
-    required int seriesId,
+    required String seriesId,
     required int totalSeasons,
     required int totalEpisodes,
     required String status,
@@ -106,7 +109,7 @@ abstract class SeriesInfo with _$SeriesInfo {
 @freezed
 abstract class Season with _$Season {
   const factory Season({
-    required int id,
+    required String id,
     required int seasonNumber,
     String? title,
     int? year,
@@ -119,13 +122,13 @@ abstract class Season with _$Season {
 @freezed
 abstract class Episode with _$Episode {
   const factory Episode({
-    required int id,
+    required String id,
     required int episodeNumber,
     required String title,
     String? description,
     int? durationSeconds,
     String? thumbnailUrl,
-    int? contentId,
+    String? contentId,
     WatchProgress? watchProgress,
   }) = _Episode;
   factory Episode.fromJson(Map<String, dynamic> json) => _$EpisodeFromJson(json);
@@ -134,7 +137,7 @@ abstract class Episode with _$Episode {
 @freezed
 abstract class VideoAsset with _$VideoAsset {
   const factory VideoAsset({
-    required int id,
+    required String id,
     required String playerType,
     required String status,
     String? hlsManifestUrl,
@@ -158,7 +161,7 @@ abstract class VideoQuality with _$VideoQuality {
 @freezed
 abstract class Subtitle with _$Subtitle {
   const factory Subtitle({
-    required int id,
+    required String id,
     required String languageCode,
     required String label,
     required String format,
@@ -171,7 +174,7 @@ abstract class Subtitle with _$Subtitle {
 @freezed
 abstract class AudioTrack with _$AudioTrack {
   const factory AudioTrack({
-    required int id,
+    required String id,
     required String languageCode,
     required String label,
     required int trackIndex,
@@ -196,7 +199,7 @@ abstract class WatchProgress with _$WatchProgress {
 @freezed
 abstract class LiveStream with _$LiveStream {
   const factory LiveStream({
-    required int id,
+    required String id,
     required String title,
     required String status,
     required String streamType,
@@ -221,7 +224,7 @@ abstract class LiveStream with _$LiveStream {
 @freezed
 abstract class SubscriptionPlan with _$SubscriptionPlan {
   const factory SubscriptionPlan({
-    required int id,
+    required String id,
     required String name,
     required double price,
     required String currency,
@@ -242,7 +245,7 @@ abstract class SubscriptionPlan with _$SubscriptionPlan {
 @freezed
 abstract class UserSubscription with _$UserSubscription {
   const factory UserSubscription({
-    required int id,
+    required String id,
     required SubscriptionPlan plan,
     required String status,
     required DateTime startDate,
@@ -257,7 +260,7 @@ abstract class UserSubscription with _$UserSubscription {
 @freezed
 abstract class UserProfile with _$UserProfile {
   const factory UserProfile({
-    required int id,
+    required String id,
     required String displayName,
     String? avatarUrl,
     String? avatarColor,
@@ -274,7 +277,7 @@ abstract class UserProfile with _$UserProfile {
 @freezed
 abstract class Banner with _$Banner {
   const factory Banner({
-    required int id,
+    required String id,
     String? title,
     String? subtitle,
     required String imageUrl,
@@ -291,7 +294,7 @@ abstract class Banner with _$Banner {
 @freezed
 abstract class ContentRow with _$ContentRow {
   const factory ContentRow({
-    required int id,
+    required String id,
     required String title,
     required String rowType,
     required List<Content> items,
@@ -304,7 +307,7 @@ abstract class ContentRow with _$ContentRow {
 @freezed
 abstract class AppNotification with _$AppNotification {
   const factory AppNotification({
-    required int id,
+    required String id,
     required String title,
     required String body,
     required String type,
@@ -321,7 +324,7 @@ abstract class AppNotification with _$AppNotification {
 abstract class WatchParty with _$WatchParty {
   const factory WatchParty({
     required String code,
-    required int contentId,
+    required String contentId,
     required String status,
     required bool isPlaying,
     required int currentPosition,
@@ -335,7 +338,7 @@ abstract class WatchParty with _$WatchParty {
 @freezed
 abstract class WatchPartyMember with _$WatchPartyMember {
   const factory WatchPartyMember({
-    required int userId,
+    required String userId,
     required String displayName,
     String? avatarUrl,
     required bool isHost,
