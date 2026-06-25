@@ -1,4 +1,5 @@
 import '../models/content.dart';
+import '../models/stream_info.dart';
 import '../../core/network/api_service.dart';
 
 class ContentRepository {
@@ -7,26 +8,22 @@ class ContentRepository {
 
   Future<List<Banner>> getBanners() async {
     final resp = await _api.getBanners();
-    return (resp as List).map((e) => Banner.fromJson(e)).toList();
+    return resp.map((e) => Banner.fromJson(e)).toList();
   }
 
   Future<List<ContentRow>> getContentRows() async {
     final resp = await _api.getContentRows();
-    return (resp as List).map((e) => ContentRow.fromJson(e)).toList();
+    return resp.map((e) => ContentRow.fromJson(e)).toList();
   }
 
   Future<List<Content>> getFeatured() async {
     final resp = await _api.getFeatured();
-    return (resp as List).map((e) => Content.fromJson(e)).toList();
+    return resp.map((e) => Content.fromJson(e)).toList();
   }
 
   Future<PagedResult<Content>> search(String query, {String? genre, String? type, int page = 1}) async {
     final resp = await _api.search(query: query, genre: genre, type: type, page: page);
-    return PagedResult<Content>(
-      data: (resp['data'] as List).map((e) => Content.fromJson(e)).toList(),
-      total: resp['total'],
-      hasNextPage: resp['hasNextPage'],
-    );
+    return PagedResult<Content>.of(resp, (e) => Content.fromJson(e));
   }
 
   Future<Content> getContent(String contentId) async {
@@ -36,7 +33,7 @@ class ContentRepository {
 
   Future<List<Content>> getRelated(String contentId) async {
     final resp = await _api.getRelated(contentId);
-    return (resp as List).map((e) => Content.fromJson(e)).toList();
+    return resp.map((e) => Content.fromJson(e)).toList();
   }
 
   Future<StreamInfo> getStreamUrl({required String contentId, String? episodeId}) async {
@@ -46,11 +43,7 @@ class ContentRepository {
 
   Future<PagedResult<Content>> getByGenre(String genreSlug, {int page = 1}) async {
     final resp = await _api.getByGenre(genreSlug, page: page);
-    return PagedResult<Content>(
-      data: (resp['data'] as List).map((e) => Content.fromJson(e)).toList(),
-      total: resp['total'],
-      hasNextPage: resp['hasNextPage'],
-    );
+    return PagedResult<Content>.of(resp, (e) => Content.fromJson(e));
   }
 
   Future<void> addToWatchlist(String contentId) async {
@@ -81,11 +74,11 @@ class ContentRepository {
 
   Future<List<Content>> getContinueWatching() async {
     final resp = await _api.getContinueWatching();
-    return (resp as List).map((e) => Content.fromJson(e)).toList();
+    return resp.map((e) => Content.fromJson(e)).toList();
   }
 
   Future<List<Content>> getWatchlist() async {
     final resp = await _api.getWatchlist();
-    return (resp as List).map((e) => Content.fromJson(e)).toList();
+    return resp.map((e) => Content.fromJson(e)).toList();
   }
 }

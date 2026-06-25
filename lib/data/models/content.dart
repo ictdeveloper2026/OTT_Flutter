@@ -359,4 +359,16 @@ abstract class PagedResult<T> with _$PagedResult<T> {
 
   factory PagedResult.fromJson(Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
       _$PagedResultFromJson(json, fromJsonT);
+
+  /// Builds from the ApiService `_paged` shape ({data, total, hasNextPage}).
+  factory PagedResult.of(Map<String, dynamic> m, T Function(dynamic) fromItem) {
+    final items = (m['data'] as List? ?? const []).map(fromItem).toList();
+    return PagedResult<T>(
+      items: items,
+      totalCount: (m['total'] ?? items.length) as int,
+      page: (m['page'] ?? 1) as int,
+      pageSize: (m['pageSize'] ?? items.length) as int,
+      hasMore: (m['hasNextPage'] ?? false) as bool,
+    );
+  }
 }

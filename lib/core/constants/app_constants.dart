@@ -4,6 +4,7 @@ class AppConstants {
   static const String appName = 'StreamVault';
   static const String appVersion = '1.0.0';
   static const int buildNumber = 1;
+  static const String platform = 'flutter';
 
   // API
   // NOTE: backend routes are mounted at /api (NOT /api/v1). Override host with

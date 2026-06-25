@@ -17,11 +17,11 @@ analyzer:
   # NOTE: the Path B migration (making this scaffold the product) is happening on the
   # `path-b-migration` branch, where these excludes are progressively removed.
   exclude:
+    # Progressively un-excluded as each layer is migrated to Path B.
+    # Migrated so far: core/network, data/models, data/repositories.
     - lib/core/di/**
-    - lib/core/network/**
     - lib/core/router/**
     - lib/core/theme/**
-    - lib/data/repositories/**
     - lib/presentation/**
 
 linter:

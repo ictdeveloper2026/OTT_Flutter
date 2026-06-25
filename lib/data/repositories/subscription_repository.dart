@@ -7,13 +7,13 @@ class SubscriptionRepository {
 
   Future<List<SubscriptionPlan>> getPlans() async {
     final resp = await _api.getSubscriptionPlans();
-    return (resp as List).map((e) => SubscriptionPlan.fromJson(e)).toList();
+    return resp.map((e) => SubscriptionPlan.fromJson(e)).toList();
   }
 
   Future<UserSubscription?> getCurrentSubscription() async {
     try {
       final resp = await _api.getMySubscription();
-      return UserSubscription.fromJson(resp);
+      return resp == null ? null : UserSubscription.fromJson(resp);
     } catch (_) {
       return null;
     }
@@ -48,7 +48,7 @@ class ProfileRepository {
 
   Future<List<UserProfile>> getProfiles() async {
     final resp = await _api.getProfiles();
-    return (resp as List).map((e) => UserProfile.fromJson(e)).toList();
+    return resp.map((e) => UserProfile.fromJson(e)).toList();
   }
 
   Future<void> selectProfile(String profileId) async {
@@ -83,7 +83,7 @@ class LiveRepository {
 
   Future<List<LiveStream>> getLiveStreams() async {
     final resp = await _api.getLiveStreams();
-    return (resp as List).map((e) => LiveStream.fromJson(e)).toList();
+    return resp.map((e) => LiveStream.fromJson(e)).toList();
   }
 
   Future<LiveStream> getLiveStream(String streamId) async {
@@ -102,34 +102,24 @@ class AdminRepository {
 
   Future<PagedResult<Content>> getContents({int page = 1, String? search}) async {
     final resp = await _api.adminGetContents(page: page, search: search);
-    return PagedResult<Content>(
-      data: (resp['data'] as List).map((e) => Content.fromJson(e)).toList(),
-      total: resp['total'],
-      hasNextPage: resp['hasNextPage'],
-    );
+    return PagedResult<Content>.of(resp, (e) => Content.fromJson(e));
   }
 
   Future<PagedResult<UserProfile>> getUsers({int page = 1, String? search}) async {
     final resp = await _api.adminGetUsers(page: page, search: search);
-    return PagedResult<UserProfile>(
-      data: (resp['data'] as List).map((e) => UserProfile.fromJson(e)).toList(),
-      total: resp['total'],
-      hasNextPage: resp['hasNextPage'],
-    );
+    return PagedResult<UserProfile>.of(resp, (e) => UserProfile.fromJson(e));
   }
 
   Future<List<LiveStream>> getLiveStreams() async {
     final resp = await _api.adminGetLiveStreams();
-    return (resp as List).map((e) => LiveStream.fromJson(e)).toList();
+    return resp.map((e) => LiveStream.fromJson(e)).toList();
   }
 
-  Future<Map<String, dynamic>> getAnalytics({String period = '30d'}) async {
-    return await _api.getAdminAnalytics(period: period);
-  }
+  Future<List<dynamic>> getAnalytics({String period = '30d'}) async => _api.getAdminAnalytics(period: period);
 
   Future<List<SubscriptionPlan>> getSubscriptionPlans() async {
     final resp = await _api.adminGetSubscriptionPlans();
-    return (resp as List).map((e) => SubscriptionPlan.fromJson(e)).toList();
+    return resp.map((e) => SubscriptionPlan.fromJson(e)).toList();
   }
 
   Future<void> deleteContent(String contentId) async {

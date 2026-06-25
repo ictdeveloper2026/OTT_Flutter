@@ -40,7 +40,7 @@ class AuthRepository {
   Future<UserProfile?> getCurrentUser() async {
     try {
       final resp = await _api.getMe();
-      return UserProfile.fromJson(resp);
+      return resp == null ? null : UserProfile.fromJson(resp);
     } catch (_) {
       return null;
     }
