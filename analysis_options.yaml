@@ -17,11 +17,15 @@ analyzer:
   # NOTE: the Path B migration (making this scaffold the product) is happening on the
   # `path-b-migration` branch, where these excludes are progressively removed.
   exclude:
-    # Progressively un-excluded as each layer is migrated to Path B.
-    # Migrated: core/network, data/models, data/repositories, presentation/blocs,
-    # core/theme, core/router, presentation/widgets.
-    - lib/core/di/**
+    # Path B migration progress. Migrated + analyze-clean: core/network, data/**,
+    # presentation/blocs, core/theme, core/router, presentation/widgets.
+    # Pending (still being ported screen-by-screen): presentation/screens, core/di,
+    # and the old monolith entry (deleted in M5).
     - lib/presentation/screens/**
+    - lib/core/di/**
+    - lib/main.dart
+    - lib/hls_stub.dart
+    - lib/hls_web.dart
 
 linter:
   # The lint rules applied to this project can be customized in the

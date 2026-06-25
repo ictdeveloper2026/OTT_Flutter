@@ -1609,7 +1609,7 @@ extension ContentPatterns on Content {
 
 /// @nodoc
 @JsonSerializable()
-class _Content implements Content {
+class _Content extends Content {
   const _Content(
       {required this.id,
       required this.title,
@@ -1651,7 +1651,8 @@ class _Content implements Content {
       : _genres = genres,
         _cast = cast,
         _subtitles = subtitles,
-        _audioTracks = audioTracks;
+        _audioTracks = audioTracks,
+        super._();
   factory _Content.fromJson(Map<String, dynamic> json) =>
       _$ContentFromJson(json);
 
@@ -2480,14 +2481,15 @@ extension CastMemberPatterns on CastMember {
 
 /// @nodoc
 @JsonSerializable()
-class _CastMember implements CastMember {
+class _CastMember extends CastMember {
   const _CastMember(
       {required this.id,
       required this.personName,
       required this.role,
       this.characterName,
       this.photoUrl,
-      this.sortOrder});
+      this.sortOrder})
+      : super._();
   factory _CastMember.fromJson(Map<String, dynamic> json) =>
       _$CastMemberFromJson(json);
 
@@ -6442,7 +6444,7 @@ extension LiveStreamPatterns on LiveStream {
 
 /// @nodoc
 @JsonSerializable()
-class _LiveStream implements LiveStream {
+class _LiveStream extends LiveStream {
   const _LiveStream(
       {required this.id,
       required this.title,
@@ -6460,7 +6462,8 @@ class _LiveStream implements LiveStream {
       this.scheduledAt,
       this.startedAt,
       this.chatEnabled,
-      this.dvrEnabled});
+      this.dvrEnabled})
+      : super._();
   factory _LiveStream.fromJson(Map<String, dynamic> json) =>
       _$LiveStreamFromJson(json);
 
@@ -7136,7 +7139,7 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
 
 /// @nodoc
 @JsonSerializable()
-class _SubscriptionPlan implements SubscriptionPlan {
+class _SubscriptionPlan extends SubscriptionPlan {
   const _SubscriptionPlan(
       {required this.id,
       required this.name,
@@ -7151,7 +7154,8 @@ class _SubscriptionPlan implements SubscriptionPlan {
       this.adFree,
       final List<String>? features,
       this.isActive})
-      : _features = features;
+      : _features = features,
+        super._();
   factory _SubscriptionPlan.fromJson(Map<String, dynamic> json) =>
       _$SubscriptionPlanFromJson(json);
 
@@ -8199,7 +8203,7 @@ extension UserProfilePatterns on UserProfile {
 
 /// @nodoc
 @JsonSerializable()
-class _UserProfile implements UserProfile {
+class _UserProfile extends UserProfile {
   const _UserProfile(
       {required this.id,
       required this.displayName,
@@ -8209,7 +8213,8 @@ class _UserProfile implements UserProfile {
       this.maxContentRating,
       this.languageCode,
       this.isDefault,
-      this.dailyTimeLimitMinutes});
+      this.dailyTimeLimitMinutes})
+      : super._();
   factory _UserProfile.fromJson(Map<String, dynamic> json) =>
       _$UserProfileFromJson(json);
 

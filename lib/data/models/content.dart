@@ -40,6 +40,7 @@ abstract class BrandingConfig with _$BrandingConfig {
 // ── Content ──
 @freezed
 abstract class Content with _$Content {
+  const Content._();
   // Only id/title are guaranteed by the backend ContentListItemDto; everything else is optional
   // so deserializing a lean list item (which omits most fields) never throws.
   const factory Content({
@@ -84,10 +85,16 @@ abstract class Content with _$Content {
   }) = _Content;
 
   factory Content.fromJson(Map<String, dynamic> json) => _$ContentFromJson(json);
+  String get contentType => type;
+  String? get ageRating => contentRating;
+  double? get avgRating => averageRating;
+  int get durationMinutes => ((durationSeconds ?? 0) / 60).round();
+  List<Season> get seasons => seriesInfo?.seasons ?? const [];
 }
 
 @freezed
 abstract class CastMember with _$CastMember {
+  const CastMember._();
   const factory CastMember({
     required String id,
     required String personName,
@@ -97,6 +104,8 @@ abstract class CastMember with _$CastMember {
     int? sortOrder,
   }) = _CastMember;
   factory CastMember.fromJson(Map<String, dynamic> json) => _$CastMemberFromJson(json);
+  String get name => personName;
+  String? get character => characterName;
 }
 
 @freezed
@@ -203,6 +212,7 @@ abstract class WatchProgress with _$WatchProgress {
 // ── Live Stream ──
 @freezed
 abstract class LiveStream with _$LiveStream {
+  const LiveStream._();
   const factory LiveStream({
     required String id,
     required String title,
@@ -223,11 +233,13 @@ abstract class LiveStream with _$LiveStream {
     bool? dvrEnabled,
   }) = _LiveStream;
   factory LiveStream.fromJson(Map<String, dynamic> json) => _$LiveStreamFromJson(json);
+  int get viewerCount => currentViewers ?? 0;
 }
 
 // ── Subscription Plan ──
 @freezed
 abstract class SubscriptionPlan with _$SubscriptionPlan {
+  const SubscriptionPlan._();
   const factory SubscriptionPlan({
     required String id,
     required String name,
@@ -244,6 +256,7 @@ abstract class SubscriptionPlan with _$SubscriptionPlan {
     bool? isActive,
   }) = _SubscriptionPlan;
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) => _$SubscriptionPlanFromJson(json);
+  int get intervalMonths => billingCycle.toLowerCase() == 'yearly' ? 12 : 1;
 }
 
 // ── User Subscription ──
@@ -264,6 +277,7 @@ abstract class UserSubscription with _$UserSubscription {
 // ── User Profile ──
 @freezed
 abstract class UserProfile with _$UserProfile {
+  const UserProfile._();
   const factory UserProfile({
     required String id,
     required String displayName,
@@ -276,6 +290,8 @@ abstract class UserProfile with _$UserProfile {
     int? dailyTimeLimitMinutes,
   }) = _UserProfile;
   factory UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
+  String get name => displayName;
+  bool get isKid => isKids ?? false;
 }
 
 // ── Banner ──
