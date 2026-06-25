@@ -64,6 +64,7 @@ _Content _$ContentFromJson(Map<String, dynamic> json) => _Content(
       durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
       contentRating: json['ageRating'] as String?,
       status: json['status'] as String?,
+      price: (json['price'] as num?)?.toDouble(),
       averageRating: (json['averageRating'] as num?)?.toDouble(),
       totalRatings: (json['totalRatings'] as num?)?.toInt(),
       totalViews: (json['totalViews'] as num?)?.toInt(),
@@ -117,6 +118,7 @@ Map<String, dynamic> _$ContentToJson(_Content instance) => <String, dynamic>{
       'durationSeconds': instance.durationSeconds,
       'ageRating': instance.contentRating,
       'status': instance.status,
+      'price': instance.price,
       'averageRating': instance.averageRating,
       'totalRatings': instance.totalRatings,
       'totalViews': instance.totalViews,
@@ -469,6 +471,7 @@ _ContentRow _$ContentRowFromJson(Map<String, dynamic> json) => _ContentRow(
       id: json['id'] as String,
       title: json['title'] as String,
       rowType: json['rowType'] as String,
+      displayStyle: json['displayStyle'] as String?,
       items: (json['items'] as List<dynamic>)
           .map((e) => Content.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -480,6 +483,7 @@ Map<String, dynamic> _$ContentRowToJson(_ContentRow instance) =>
       'id': instance.id,
       'title': instance.title,
       'rowType': instance.rowType,
+      'displayStyle': instance.displayStyle,
       'items': instance.items,
       'maxItems': instance.maxItems,
     };

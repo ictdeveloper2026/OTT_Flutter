@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../data/models/branding_config.dart';
+import '../../data/models/content.dart';
 
 class AppTheme {
   AppTheme._();

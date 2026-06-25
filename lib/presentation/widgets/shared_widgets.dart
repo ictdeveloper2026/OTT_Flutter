@@ -76,16 +76,16 @@ class ContentCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (content.isNew)
+                          if ((content.isNewRelease ?? false))
                             _buildBadge('NEW', Colors.green),
-                          if (content.isTrending) ...[
-                            if (content.isNew) const SizedBox(height: 4),
+                          if ((content.isTrending ?? false)) ...[
+                            if ((content.isNewRelease ?? false)) const SizedBox(height: 4),
                             _buildBadge('🔥', colors.primary),
                           ],
                         ],
                       ),
                     ),
-                    if (content.monetizationModel == 'tvod' || content.monetizationModel == 'paid')
+                    if (content.accessTier == 'tvod' || content.accessTier == 'paid')
                       Positioned(
                         top: 6,
                         right: 6,
@@ -339,9 +339,9 @@ class _NotificationBell extends StatelessWidget {
 
 // ── Content Row Widget ────────────────────────────────────────────────────────
 
-class ContentRow extends StatelessWidget {
+class ContentRowWidget extends StatelessWidget {
   final ContentRowData row;
-  const ContentRow({super.key, required this.row});
+  const ContentRowWidget({super.key, required this.row});
 
   @override
   Widget build(BuildContext context) {

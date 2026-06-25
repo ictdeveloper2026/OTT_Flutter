@@ -779,6 +779,7 @@ mixin _$Content {
   @JsonKey(name: 'ageRating')
   String? get contentRating; // backend sends ageRating
   String? get status;
+  double? get price;
   double? get averageRating;
   int? get totalRatings;
   int? get totalViews;
@@ -844,6 +845,7 @@ mixin _$Content {
             (identical(other.contentRating, contentRating) ||
                 other.contentRating == contentRating) &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.price, price) || other.price == price) &&
             (identical(other.averageRating, averageRating) ||
                 other.averageRating == averageRating) &&
             (identical(other.totalRatings, totalRatings) ||
@@ -901,6 +903,7 @@ mixin _$Content {
         durationSeconds,
         contentRating,
         status,
+        price,
         averageRating,
         totalRatings,
         totalViews,
@@ -924,7 +927,7 @@ mixin _$Content {
 
   @override
   String toString() {
-    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
+    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, price: $price, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
   }
 }
 
@@ -951,6 +954,7 @@ abstract mixin class $ContentCopyWith<$Res> {
       int? durationSeconds,
       @JsonKey(name: 'ageRating') String? contentRating,
       String? status,
+      double? price,
       double? averageRating,
       int? totalRatings,
       int? totalViews,
@@ -1005,6 +1009,7 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
     Object? durationSeconds = freezed,
     Object? contentRating = freezed,
     Object? status = freezed,
+    Object? price = freezed,
     Object? averageRating = freezed,
     Object? totalRatings = freezed,
     Object? totalViews = freezed,
@@ -1094,6 +1099,10 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
+      price: freezed == price
+          ? _self.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double?,
       averageRating: freezed == averageRating
           ? _self.averageRating
           : averageRating // ignore: cast_nullable_to_non_nullable
@@ -1327,6 +1336,7 @@ extension ContentPatterns on Content {
             int? durationSeconds,
             @JsonKey(name: 'ageRating') String? contentRating,
             String? status,
+            double? price,
             double? averageRating,
             int? totalRatings,
             int? totalViews,
@@ -1370,6 +1380,7 @@ extension ContentPatterns on Content {
             _that.durationSeconds,
             _that.contentRating,
             _that.status,
+            _that.price,
             _that.averageRating,
             _that.totalRatings,
             _that.totalViews,
@@ -1427,6 +1438,7 @@ extension ContentPatterns on Content {
             int? durationSeconds,
             @JsonKey(name: 'ageRating') String? contentRating,
             String? status,
+            double? price,
             double? averageRating,
             int? totalRatings,
             int? totalViews,
@@ -1469,6 +1481,7 @@ extension ContentPatterns on Content {
             _that.durationSeconds,
             _that.contentRating,
             _that.status,
+            _that.price,
             _that.averageRating,
             _that.totalRatings,
             _that.totalViews,
@@ -1525,6 +1538,7 @@ extension ContentPatterns on Content {
             int? durationSeconds,
             @JsonKey(name: 'ageRating') String? contentRating,
             String? status,
+            double? price,
             double? averageRating,
             int? totalRatings,
             int? totalViews,
@@ -1567,6 +1581,7 @@ extension ContentPatterns on Content {
             _that.durationSeconds,
             _that.contentRating,
             _that.status,
+            _that.price,
             _that.averageRating,
             _that.totalRatings,
             _that.totalViews,
@@ -1613,6 +1628,7 @@ class _Content implements Content {
       this.durationSeconds,
       @JsonKey(name: 'ageRating') this.contentRating,
       this.status,
+      this.price,
       this.averageRating,
       this.totalRatings,
       this.totalViews,
@@ -1678,6 +1694,8 @@ class _Content implements Content {
 // backend sends ageRating
   @override
   final String? status;
+  @override
+  final double? price;
   @override
   final double? averageRating;
   @override
@@ -1799,6 +1817,7 @@ class _Content implements Content {
             (identical(other.contentRating, contentRating) ||
                 other.contentRating == contentRating) &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.price, price) || other.price == price) &&
             (identical(other.averageRating, averageRating) ||
                 other.averageRating == averageRating) &&
             (identical(other.totalRatings, totalRatings) ||
@@ -1857,6 +1876,7 @@ class _Content implements Content {
         durationSeconds,
         contentRating,
         status,
+        price,
         averageRating,
         totalRatings,
         totalViews,
@@ -1880,7 +1900,7 @@ class _Content implements Content {
 
   @override
   String toString() {
-    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
+    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, price: $price, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
   }
 }
 
@@ -1908,6 +1928,7 @@ abstract mixin class _$ContentCopyWith<$Res> implements $ContentCopyWith<$Res> {
       int? durationSeconds,
       @JsonKey(name: 'ageRating') String? contentRating,
       String? status,
+      double? price,
       double? averageRating,
       int? totalRatings,
       int? totalViews,
@@ -1965,6 +1986,7 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
     Object? durationSeconds = freezed,
     Object? contentRating = freezed,
     Object? status = freezed,
+    Object? price = freezed,
     Object? averageRating = freezed,
     Object? totalRatings = freezed,
     Object? totalViews = freezed,
@@ -2054,6 +2076,10 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
+      price: freezed == price
+          ? _self.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double?,
       averageRating: freezed == averageRating
           ? _self.averageRating
           : averageRating // ignore: cast_nullable_to_non_nullable
@@ -8866,6 +8892,7 @@ mixin _$ContentRow {
   String get id;
   String get title;
   String get rowType;
+  String? get displayStyle;
   List<Content> get items;
   int? get maxItems;
 
@@ -8887,6 +8914,8 @@ mixin _$ContentRow {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.rowType, rowType) || other.rowType == rowType) &&
+            (identical(other.displayStyle, displayStyle) ||
+                other.displayStyle == displayStyle) &&
             const DeepCollectionEquality().equals(other.items, items) &&
             (identical(other.maxItems, maxItems) ||
                 other.maxItems == maxItems));
@@ -8894,12 +8923,12 @@ mixin _$ContentRow {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, rowType,
+  int get hashCode => Object.hash(runtimeType, id, title, rowType, displayStyle,
       const DeepCollectionEquality().hash(items), maxItems);
 
   @override
   String toString() {
-    return 'ContentRow(id: $id, title: $title, rowType: $rowType, items: $items, maxItems: $maxItems)';
+    return 'ContentRow(id: $id, title: $title, rowType: $rowType, displayStyle: $displayStyle, items: $items, maxItems: $maxItems)';
   }
 }
 
@@ -8913,6 +8942,7 @@ abstract mixin class $ContentRowCopyWith<$Res> {
       {String id,
       String title,
       String rowType,
+      String? displayStyle,
       List<Content> items,
       int? maxItems});
 }
@@ -8932,6 +8962,7 @@ class _$ContentRowCopyWithImpl<$Res> implements $ContentRowCopyWith<$Res> {
     Object? id = null,
     Object? title = null,
     Object? rowType = null,
+    Object? displayStyle = freezed,
     Object? items = null,
     Object? maxItems = freezed,
   }) {
@@ -8948,6 +8979,10 @@ class _$ContentRowCopyWithImpl<$Res> implements $ContentRowCopyWith<$Res> {
           ? _self.rowType
           : rowType // ignore: cast_nullable_to_non_nullable
               as String,
+      displayStyle: freezed == displayStyle
+          ? _self.displayStyle
+          : displayStyle // ignore: cast_nullable_to_non_nullable
+              as String?,
       items: null == items
           ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
@@ -9054,15 +9089,15 @@ extension ContentRowPatterns on ContentRow {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String id, String title, String rowType,
-            List<Content> items, int? maxItems)?
+            String? displayStyle, List<Content> items, int? maxItems)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _ContentRow() when $default != null:
-        return $default(
-            _that.id, _that.title, _that.rowType, _that.items, _that.maxItems);
+        return $default(_that.id, _that.title, _that.rowType,
+            _that.displayStyle, _that.items, _that.maxItems);
       case _:
         return orElse();
     }
@@ -9084,14 +9119,14 @@ extension ContentRowPatterns on ContentRow {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String id, String title, String rowType,
-            List<Content> items, int? maxItems)
+            String? displayStyle, List<Content> items, int? maxItems)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ContentRow():
-        return $default(
-            _that.id, _that.title, _that.rowType, _that.items, _that.maxItems);
+        return $default(_that.id, _that.title, _that.rowType,
+            _that.displayStyle, _that.items, _that.maxItems);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -9112,14 +9147,14 @@ extension ContentRowPatterns on ContentRow {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String id, String title, String rowType,
-            List<Content> items, int? maxItems)?
+            String? displayStyle, List<Content> items, int? maxItems)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ContentRow() when $default != null:
-        return $default(
-            _that.id, _that.title, _that.rowType, _that.items, _that.maxItems);
+        return $default(_that.id, _that.title, _that.rowType,
+            _that.displayStyle, _that.items, _that.maxItems);
       case _:
         return null;
     }
@@ -9133,6 +9168,7 @@ class _ContentRow implements ContentRow {
       {required this.id,
       required this.title,
       required this.rowType,
+      this.displayStyle,
       required final List<Content> items,
       this.maxItems})
       : _items = items;
@@ -9145,6 +9181,8 @@ class _ContentRow implements ContentRow {
   final String title;
   @override
   final String rowType;
+  @override
+  final String? displayStyle;
   final List<Content> _items;
   @override
   List<Content> get items {
@@ -9179,6 +9217,8 @@ class _ContentRow implements ContentRow {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.rowType, rowType) || other.rowType == rowType) &&
+            (identical(other.displayStyle, displayStyle) ||
+                other.displayStyle == displayStyle) &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.maxItems, maxItems) ||
                 other.maxItems == maxItems));
@@ -9186,12 +9226,12 @@ class _ContentRow implements ContentRow {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, rowType,
+  int get hashCode => Object.hash(runtimeType, id, title, rowType, displayStyle,
       const DeepCollectionEquality().hash(_items), maxItems);
 
   @override
   String toString() {
-    return 'ContentRow(id: $id, title: $title, rowType: $rowType, items: $items, maxItems: $maxItems)';
+    return 'ContentRow(id: $id, title: $title, rowType: $rowType, displayStyle: $displayStyle, items: $items, maxItems: $maxItems)';
   }
 }
 
@@ -9207,6 +9247,7 @@ abstract mixin class _$ContentRowCopyWith<$Res>
       {String id,
       String title,
       String rowType,
+      String? displayStyle,
       List<Content> items,
       int? maxItems});
 }
@@ -9226,6 +9267,7 @@ class __$ContentRowCopyWithImpl<$Res> implements _$ContentRowCopyWith<$Res> {
     Object? id = null,
     Object? title = null,
     Object? rowType = null,
+    Object? displayStyle = freezed,
     Object? items = null,
     Object? maxItems = freezed,
   }) {
@@ -9242,6 +9284,10 @@ class __$ContentRowCopyWithImpl<$Res> implements _$ContentRowCopyWith<$Res> {
           ? _self.rowType
           : rowType // ignore: cast_nullable_to_non_nullable
               as String,
+      displayStyle: freezed == displayStyle
+          ? _self.displayStyle
+          : displayStyle // ignore: cast_nullable_to_non_nullable
+              as String?,
       items: null == items
           ? _self._items
           : items // ignore: cast_nullable_to_non_nullable

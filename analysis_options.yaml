@@ -18,12 +18,10 @@ analyzer:
   # `path-b-migration` branch, where these excludes are progressively removed.
   exclude:
     # Progressively un-excluded as each layer is migrated to Path B.
-    # Migrated so far: core/network, data/models, data/repositories, presentation/blocs.
+    # Migrated: core/network, data/models, data/repositories, presentation/blocs,
+    # core/theme, core/router, presentation/widgets.
     - lib/core/di/**
-    - lib/core/router/**
-    - lib/core/theme/**
     - lib/presentation/screens/**
-    - lib/presentation/widgets/**
 
 linter:
   # The lint rules applied to this project can be customized in the

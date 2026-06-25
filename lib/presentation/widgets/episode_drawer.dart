@@ -114,7 +114,7 @@ class _EpisodeDrawerState extends State<EpisodeDrawer> {
 
   Widget _buildEpisodeList(OttColors colors) {
     final season = widget.seasons.isNotEmpty ? widget.seasons[_selectedSeason] : null;
-    if (season == null || season.episodes.isEmpty) {
+    if (season == null || (season.episodes?.isEmpty ?? true)) {
       return Center(
         child: Text('No episodes available', style: TextStyle(color: colors.textSecondary)),
       );
@@ -122,8 +122,8 @@ class _EpisodeDrawerState extends State<EpisodeDrawer> {
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: season.episodes.length,
-      itemBuilder: (context, i) => _buildEpisodeTile(season.episodes[i], colors),
+      itemCount: season.episodes!.length,
+      itemBuilder: (context, i) => _buildEpisodeTile(season.episodes![i], colors),
     );
   }
 
@@ -196,17 +196,6 @@ class _EpisodeDrawerState extends State<EpisodeDrawer> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (episode.isFree) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text('FREE', style: TextStyle(color: Colors.green, fontSize: 9, fontWeight: FontWeight.bold)),
-                        ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 3),

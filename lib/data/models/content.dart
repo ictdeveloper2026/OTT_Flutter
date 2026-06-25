@@ -3,6 +3,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'content.freezed.dart';
 part 'content.g.dart';
 
+// Aliases used by widgets/screens.
+typedef ContentListItem = Content;
+typedef ContentRowData = ContentRow;
+
 // ── Branding Config ──
 @freezed
 abstract class BrandingConfig with _$BrandingConfig {
@@ -57,6 +61,7 @@ abstract class Content with _$Content {
     int? durationSeconds,
     @JsonKey(name: 'ageRating') String? contentRating, // backend sends ageRating
     String? status,
+    double? price,
     double? averageRating,
     int? totalRatings,
     int? totalViews,
@@ -297,6 +302,7 @@ abstract class ContentRow with _$ContentRow {
     required String id,
     required String title,
     required String rowType,
+    String? displayStyle,
     required List<Content> items,
     int? maxItems,
   }) = _ContentRow;

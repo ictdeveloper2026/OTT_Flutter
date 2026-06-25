@@ -50,7 +50,7 @@ class AppRouter {
     initialLocation: '/splash',
     redirect: (context, state) {
       final authState = context.read<AuthBloc>().state;
-      final isAuthenticated = authState is AuthAuthenticatedState;
+      final isAuthenticated = authState is AuthAuthenticated;
       final isOnAuthPage = state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash';
 
       if (!isAuthenticated && !isOnAuthPage) return '/auth/login';
