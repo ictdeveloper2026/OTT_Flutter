@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/content/content_bloc.dart';
-import '../../blocs/content/content_event.dart';
-import '../../blocs/content/content_state.dart';
-import '../../widgets/content_card.dart';
+import '../../widgets/shared_widgets.dart';
 
 class GenreScreen extends StatefulWidget {
   final String genreId;
@@ -28,8 +26,8 @@ class _GenreScreenState extends State<GenreScreen> {
   }
 
   void _loadContent() {
-    context.read<ContentBloc>().add(LoadGenreContentEvent(
-      genreId: widget.genreId,
+    context.read<ContentBloc>().add(ContentGenreLoaded(
+      genreSlug: widget.genreId,
       page: 1,
     ));
   }
@@ -37,8 +35,8 @@ class _GenreScreenState extends State<GenreScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 400) {
       final state = context.read<ContentBloc>().state;
-      if (state is GenreContentLoaded && state.hasMore && !state.isLoadingMore) {
-        context.read<ContentBloc>().add(LoadMoreGenreContentEvent(genreId: widget.genreId));
+      if (state is ContentGenreLoaded2 && state.hasMore) {
+        context.read<ContentBloc>().add(ContentGenreLoaded(genreSlug: widget.genreId, page: state.page + 1));
       }
     }
   }
@@ -99,7 +97,7 @@ class _GenreScreenState extends State<GenreScreen> {
             BlocBuilder<ContentBloc, ContentState>(
               builder: (context, state) {
                 int count = 0;
-                if (state is GenreContentLoaded) count = state.totalCount;
+                if (state is ContentGenreLoaded2) count = state.items.length;
                 return Text('$count titles', style: TextStyle(color: colors.textSecondary, fontSize: 13));
               },
             ),
@@ -135,10 +133,9 @@ class _GenreScreenState extends State<GenreScreen> {
           onChanged: (value) {
             if (value != null) {
               setState(() => _sortBy = value);
-              context.read<ContentBloc>().add(LoadGenreContentEvent(
-                genreId: widget.genreId,
+              context.read<ContentBloc>().add(ContentGenreLoaded(
+                genreSlug: widget.genreId,
                 page: 1,
-                sortBy: value,
               ));
             }
           },
@@ -173,7 +170,7 @@ class _GenreScreenState extends State<GenreScreen> {
           );
         }
 
-        if (state is GenreContentLoaded) {
+        if (state is ContentGenreLoaded2) {
           if (state.items.isEmpty) {
             return SliverFillRemaining(
               child: Center(
@@ -202,13 +199,13 @@ class _GenreScreenState extends State<GenreScreen> {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   if (index == state.items.length) {
-                    return state.isLoadingMore
+                    return false
                         ? Center(child: CircularProgressIndicator(color: colors.primary, strokeWidth: 2))
                         : const SizedBox.shrink();
                   }
                   return ContentCard(content: state.items[index]);
                 },
-                childCount: state.items.length + (state.isLoadingMore ? 1 : 0),
+                childCount: state.items.length + (false ? 1 : 0),
               ),
             ),
           );

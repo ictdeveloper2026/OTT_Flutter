@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Banner;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
@@ -9,9 +9,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/content/content_bloc.dart';
 import '../../../data/models/content.dart';
-import '../../widgets/cards/content_card.dart';
-import '../../widgets/common/app_header.dart';
-import '../../widgets/common/gradient_button.dart';
+import '../../widgets/shared_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   @override
   void initState() {
     super.initState();
-    context.read<ContentBloc>().add(ContentLoadHomeEvent());
+    context.read<ContentBloc>().add(ContentHomeLoaded());
   }
 
   @override
@@ -42,22 +40,22 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       backgroundColor: colors.bg,
       body: BlocBuilder<ContentBloc, ContentState>(
         builder: (context, state) {
-          if (state is ContentLoadingState) return _buildShimmer(context);
-          if (state is ContentErrorState) return _buildError(context, state.message);
-          if (state is ContentHomeLoadedState) return _buildHome(context, state);
+          if (state is ContentLoading) return _buildShimmer(context);
+          if (state is ContentError) return _buildError(context, state.message);
+          if (state is ContentHomeLoaded2) return _buildHome(context, state);
           return const SizedBox.shrink();
         },
       ),
     );
   }
 
-  Widget _buildHome(BuildContext context, ContentHomeLoadedState state) {
+  Widget _buildHome(BuildContext context, ContentHomeLoaded2 state) {
     final colors = Theme.of(context).extension<OttColors>()!;
 
     return RefreshIndicator(
       color: colors.primary,
       backgroundColor: colors.surface,
-      onRefresh: () async => context.read<ContentBloc>().add(ContentLoadHomeEvent()),
+      onRefresh: () async => context.read<ContentBloc>().add(ContentHomeLoaded()),
       child: CustomScrollView(
         controller: _scrollController,
         slivers: [
@@ -65,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           SliverPersistentHeader(
             pinned: true,
             delegate: _StickyHeaderDelegate(
-              child: AppHeader(scrollController: _scrollController),
+              child: AppHeader(),
             ),
           ),
 
@@ -170,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         const SizedBox(height: 16),
         Text(message, style: TextStyle(color: colors.textSecondary), textAlign: TextAlign.center),
         const SizedBox(height: 24),
-        GradientButton(label: 'Retry', onPressed: () => context.read<ContentBloc>().add(ContentLoadHomeEvent())),
+        GradientButton(label: 'Retry', onPressed: () => context.read<ContentBloc>().add(ContentHomeLoaded())),
       ]),
     );
   }

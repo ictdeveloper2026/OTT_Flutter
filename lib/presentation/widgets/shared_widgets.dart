@@ -13,11 +13,13 @@ class ContentCard extends StatelessWidget {
   final bool showTitle;
   final bool showRating;
   final bool landscape;
+  final bool showProgress;
   final VoidCallback? onTap;
 
   const ContentCard({
     super.key,
     required this.content,
+    this.showProgress = false,
     this.width,
     this.height,
     this.showTitle = true,
@@ -69,6 +71,16 @@ class ContentCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (showProgress && content.watchProgress != null)
+                      Positioned(
+                        left: 0, right: 0, bottom: 0,
+                        child: LinearProgressIndicator(
+                          value: (content.watchProgress!.completionPct / 100).clamp(0.0, 1.0),
+                          minHeight: 3,
+                          backgroundColor: Colors.white24,
+                          valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
+                        ),
+                      ),
                     // Badges
                     Positioned(
                       top: 6,
