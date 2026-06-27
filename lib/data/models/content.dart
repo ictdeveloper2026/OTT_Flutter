@@ -74,6 +74,7 @@ abstract class Content with _$Content {
     List<String>? genres,
     List<CastMember>? cast,
     SeriesInfo? seriesInfo,
+    @Default(<Season>[]) List<Season> seasons, // backend sends seasons top-level on content detail
     VideoAsset? videoAsset,
     List<Subtitle>? subtitles,
     List<AudioTrack>? audioTracks,
@@ -90,17 +91,17 @@ abstract class Content with _$Content {
   String? get ageRating => contentRating;
   double? get avgRating => averageRating;
   int get durationMinutes => ((durationSeconds ?? 0) / 60).round();
-  List<Season> get seasons => seriesInfo?.seasons ?? const [];
 }
 
 @freezed
 abstract class CastMember with _$CastMember {
   const CastMember._();
+  // Backend CastDto is {name, character, photoUrl, role} — no id, and `name`/`character`.
   const factory CastMember({
-    required String id,
-    required String personName,
-    required String role,
-    String? characterName,
+    @Default('') String id,
+    @JsonKey(name: 'name') @Default('') String personName,
+    @Default('') String role,
+    @JsonKey(name: 'character') String? characterName,
     String? photoUrl,
     int? sortOrder,
   }) = _CastMember;
@@ -203,9 +204,9 @@ abstract class AudioTrack with _$AudioTrack {
 @freezed
 abstract class WatchProgress with _$WatchProgress {
   const factory WatchProgress({
-    required int watchedSeconds,
-    required int totalSeconds,
-    required double completionPct,
+    @JsonKey(name: 'positionSeconds') @Default(0) int watchedSeconds,
+    @JsonKey(name: 'durationSeconds') @Default(0) int totalSeconds,
+    @JsonKey(name: 'percentage') @Default(0) double completionPct,
     bool? isCompleted,
     DateTime? lastWatchedAt,
   }) = _WatchProgress;
@@ -220,15 +221,15 @@ abstract class LiveStream with _$LiveStream {
     required String id,
     required String title,
     required String status,
-    required String streamType,
-    required String accessTier,
+    @Default('') String streamType,
+    @JsonKey(name: 'monetizationModel') @Default('free') String accessTier,
     String? description,
     String? thumbnailUrl,
     String? playbackUrl,
     String? youTubeLiveId,
     String? vimeoEventId,
     double? ppvPrice,
-    int? currentViewers,
+    @JsonKey(name: 'viewerCount') int? currentViewers,
     int? totalViewers,
     DateTime? scheduledAt,
     DateTime? startedAt,
@@ -249,6 +250,8 @@ abstract class SubscriptionPlan with _$SubscriptionPlan {
     required double price,
     required String currency,
     required String billingCycle,
+    String? description,
+    @Default(false) bool isPopular,
     int? trialDays,
     int? maxProfiles,
     int? maxDevices,
@@ -260,8 +263,6 @@ abstract class SubscriptionPlan with _$SubscriptionPlan {
   }) = _SubscriptionPlan;
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) => _$SubscriptionPlanFromJson(json);
   int get intervalMonths => billingCycle.toLowerCase() == 'yearly' ? 12 : 1;
-  String? get description => null;
-  bool get isPopular => false;
 }
 
 // ── User Subscription ──
@@ -285,21 +286,24 @@ abstract class UserSubscription with _$UserSubscription {
 @freezed
 abstract class UserProfile with _$UserProfile {
   const UserProfile._();
+  // Backend sends `name` for viewing profiles (and firstName for the account user); map both
+  // safely so deserializing never throws on a missing displayName.
   const factory UserProfile({
     required String id,
-    required String displayName,
+    @JsonKey(name: 'name') @Default('') String displayName,
     String? avatarUrl,
     String? avatarColor,
     bool? isKids,
-    String? maxContentRating,
+    @JsonKey(name: 'maturityLevel') String? maxContentRating,
     String? languageCode,
     bool? isDefault,
+    @JsonKey(name: 'isPinLocked') bool? isPinLocked,
     int? dailyTimeLimitMinutes,
   }) = _UserProfile;
   factory UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
   String get name => displayName;
   bool get isKid => isKids ?? false;
-  bool get hasPin => false;
+  bool get hasPin => isPinLocked ?? false;
 }
 
 // ── Banner ──

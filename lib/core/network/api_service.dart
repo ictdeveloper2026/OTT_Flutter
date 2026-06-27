@@ -101,6 +101,15 @@ class ApiService {
 
   Future<void> logout() => _dio.post('/auth/logout');
 
+  // Persists the JWT so the auth interceptor can attach it; matches the keys it reads.
+  Future<void> saveSession(Map<String, dynamic> data) async {
+    final access = data['accessToken'] as String?;
+    final refresh = data['refreshToken'] as String?;
+    if (access != null) await _storage.write(key: 'access_token', value: access);
+    if (refresh != null) await _storage.write(key: 'refresh_token', value: refresh);
+  }
+  Future<void> clearSession() => _storage.deleteAll();
+
   Future<Map<String, dynamic>?> getMe() async {
     final r = await _dio.get('/profiles/me');
     final d = _data(r);
@@ -177,7 +186,7 @@ class ApiService {
       });
 
   // ── Live ──
-  Future<List<dynamic>> getLiveStreams() async => _list(await _dio.get('/live'));
+  Future<List<dynamic>> getLiveStreams() async => (_map(await _dio.get('/live'))['items'] as List?) ?? const [];
   Future<Map<String, dynamic>> getLiveStream(String streamId) async => _map(await _dio.get('/live/$streamId'));
 
   // ── Subscriptions / billing ──
@@ -214,7 +223,7 @@ class ApiService {
       _paged(await _dio.get('/admin/users', queryParameters: {'page': page, if (search != null) 'q': search}));
   Future<void> adminChangeUserStatus(String userId, String status) =>
       _dio.put('/admin/users/$userId/status', data: {'status': status});
-  Future<List<dynamic>> adminGetLiveStreams() async => _list(await _dio.get('/admin/live'));
+  Future<List<dynamic>> adminGetLiveStreams() async => (_map(await _dio.get('/admin/live'))['items'] as List?) ?? const [];
   Future<List<dynamic>> adminGetSubscriptionPlans() async => _list(await _dio.get('/plans'));
   Future<Map<String, dynamic>> adminCreateContent(Map<String, dynamic> data) async => _map(await _dio.post('/admin/contents', data: data));
   Future<Map<String, dynamic>> adminUpdateContent(String id, Map<String, dynamic> data) async => _map(await _dio.put('/admin/contents/$id', data: data));

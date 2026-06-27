@@ -792,6 +792,7 @@ mixin _$Content {
   List<String>? get genres;
   List<CastMember>? get cast;
   SeriesInfo? get seriesInfo;
+  List<Season> get seasons; // backend sends seasons top-level on content detail
   VideoAsset? get videoAsset;
   List<Subtitle>? get subtitles;
   List<AudioTrack>? get audioTracks;
@@ -866,6 +867,7 @@ mixin _$Content {
             const DeepCollectionEquality().equals(other.cast, cast) &&
             (identical(other.seriesInfo, seriesInfo) ||
                 other.seriesInfo == seriesInfo) &&
+            const DeepCollectionEquality().equals(other.seasons, seasons) &&
             (identical(other.videoAsset, videoAsset) ||
                 other.videoAsset == videoAsset) &&
             const DeepCollectionEquality().equals(other.subtitles, subtitles) &&
@@ -915,6 +917,7 @@ mixin _$Content {
         const DeepCollectionEquality().hash(genres),
         const DeepCollectionEquality().hash(cast),
         seriesInfo,
+        const DeepCollectionEquality().hash(seasons),
         videoAsset,
         const DeepCollectionEquality().hash(subtitles),
         const DeepCollectionEquality().hash(audioTracks),
@@ -927,7 +930,7 @@ mixin _$Content {
 
   @override
   String toString() {
-    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, price: $price, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
+    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, price: $price, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, seasons: $seasons, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
   }
 }
 
@@ -966,6 +969,7 @@ abstract mixin class $ContentCopyWith<$Res> {
       List<String>? genres,
       List<CastMember>? cast,
       SeriesInfo? seriesInfo,
+      List<Season> seasons,
       VideoAsset? videoAsset,
       List<Subtitle>? subtitles,
       List<AudioTrack>? audioTracks,
@@ -1021,6 +1025,7 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
     Object? genres = freezed,
     Object? cast = freezed,
     Object? seriesInfo = freezed,
+    Object? seasons = null,
     Object? videoAsset = freezed,
     Object? subtitles = freezed,
     Object? audioTracks = freezed,
@@ -1147,6 +1152,10 @@ class _$ContentCopyWithImpl<$Res> implements $ContentCopyWith<$Res> {
           ? _self.seriesInfo
           : seriesInfo // ignore: cast_nullable_to_non_nullable
               as SeriesInfo?,
+      seasons: null == seasons
+          ? _self.seasons
+          : seasons // ignore: cast_nullable_to_non_nullable
+              as List<Season>,
       videoAsset: freezed == videoAsset
           ? _self.videoAsset
           : videoAsset // ignore: cast_nullable_to_non_nullable
@@ -1348,6 +1357,7 @@ extension ContentPatterns on Content {
             List<String>? genres,
             List<CastMember>? cast,
             SeriesInfo? seriesInfo,
+            List<Season> seasons,
             VideoAsset? videoAsset,
             List<Subtitle>? subtitles,
             List<AudioTrack>? audioTracks,
@@ -1392,6 +1402,7 @@ extension ContentPatterns on Content {
             _that.genres,
             _that.cast,
             _that.seriesInfo,
+            _that.seasons,
             _that.videoAsset,
             _that.subtitles,
             _that.audioTracks,
@@ -1450,6 +1461,7 @@ extension ContentPatterns on Content {
             List<String>? genres,
             List<CastMember>? cast,
             SeriesInfo? seriesInfo,
+            List<Season> seasons,
             VideoAsset? videoAsset,
             List<Subtitle>? subtitles,
             List<AudioTrack>? audioTracks,
@@ -1493,6 +1505,7 @@ extension ContentPatterns on Content {
             _that.genres,
             _that.cast,
             _that.seriesInfo,
+            _that.seasons,
             _that.videoAsset,
             _that.subtitles,
             _that.audioTracks,
@@ -1550,6 +1563,7 @@ extension ContentPatterns on Content {
             List<String>? genres,
             List<CastMember>? cast,
             SeriesInfo? seriesInfo,
+            List<Season> seasons,
             VideoAsset? videoAsset,
             List<Subtitle>? subtitles,
             List<AudioTrack>? audioTracks,
@@ -1593,6 +1607,7 @@ extension ContentPatterns on Content {
             _that.genres,
             _that.cast,
             _that.seriesInfo,
+            _that.seasons,
             _that.videoAsset,
             _that.subtitles,
             _that.audioTracks,
@@ -1640,6 +1655,7 @@ class _Content extends Content {
       final List<String>? genres,
       final List<CastMember>? cast,
       this.seriesInfo,
+      final List<Season> seasons = const <Season>[],
       this.videoAsset,
       final List<Subtitle>? subtitles,
       final List<AudioTrack>? audioTracks,
@@ -1650,6 +1666,7 @@ class _Content extends Content {
       this.imdbId})
       : _genres = genres,
         _cast = cast,
+        _seasons = seasons,
         _subtitles = subtitles,
         _audioTracks = audioTracks,
         super._();
@@ -1736,6 +1753,16 @@ class _Content extends Content {
 
   @override
   final SeriesInfo? seriesInfo;
+  final List<Season> _seasons;
+  @override
+  @JsonKey()
+  List<Season> get seasons {
+    if (_seasons is EqualUnmodifiableListView) return _seasons;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_seasons);
+  }
+
+// backend sends seasons top-level on content detail
   @override
   final VideoAsset? videoAsset;
   final List<Subtitle>? _subtitles;
@@ -1839,6 +1866,7 @@ class _Content extends Content {
             const DeepCollectionEquality().equals(other._cast, _cast) &&
             (identical(other.seriesInfo, seriesInfo) ||
                 other.seriesInfo == seriesInfo) &&
+            const DeepCollectionEquality().equals(other._seasons, _seasons) &&
             (identical(other.videoAsset, videoAsset) ||
                 other.videoAsset == videoAsset) &&
             const DeepCollectionEquality()
@@ -1889,6 +1917,7 @@ class _Content extends Content {
         const DeepCollectionEquality().hash(_genres),
         const DeepCollectionEquality().hash(_cast),
         seriesInfo,
+        const DeepCollectionEquality().hash(_seasons),
         videoAsset,
         const DeepCollectionEquality().hash(_subtitles),
         const DeepCollectionEquality().hash(_audioTracks),
@@ -1901,7 +1930,7 @@ class _Content extends Content {
 
   @override
   String toString() {
-    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, price: $price, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
+    return 'Content(id: $id, title: $title, type: $type, slug: $slug, accessTier: $accessTier, description: $description, shortDescription: $shortDescription, thumbnailUrl: $thumbnailUrl, posterUrl: $posterUrl, bannerUrl: $bannerUrl, trailerUrl: $trailerUrl, trailerType: $trailerType, trailerVideoId: $trailerVideoId, releaseYear: $releaseYear, durationSeconds: $durationSeconds, contentRating: $contentRating, status: $status, price: $price, averageRating: $averageRating, totalRatings: $totalRatings, totalViews: $totalViews, isFeatured: $isFeatured, isTrending: $isTrending, isNewRelease: $isNewRelease, isOriginal: $isOriginal, languageName: $languageName, genres: $genres, cast: $cast, seriesInfo: $seriesInfo, seasons: $seasons, videoAsset: $videoAsset, subtitles: $subtitles, audioTracks: $audioTracks, watchProgress: $watchProgress, isInWatchlist: $isInWatchlist, userRating: $userRating, imdbRating: $imdbRating, imdbId: $imdbId)';
   }
 }
 
@@ -1941,6 +1970,7 @@ abstract mixin class _$ContentCopyWith<$Res> implements $ContentCopyWith<$Res> {
       List<String>? genres,
       List<CastMember>? cast,
       SeriesInfo? seriesInfo,
+      List<Season> seasons,
       VideoAsset? videoAsset,
       List<Subtitle>? subtitles,
       List<AudioTrack>? audioTracks,
@@ -1999,6 +2029,7 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
     Object? genres = freezed,
     Object? cast = freezed,
     Object? seriesInfo = freezed,
+    Object? seasons = null,
     Object? videoAsset = freezed,
     Object? subtitles = freezed,
     Object? audioTracks = freezed,
@@ -2125,6 +2156,10 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
           ? _self.seriesInfo
           : seriesInfo // ignore: cast_nullable_to_non_nullable
               as SeriesInfo?,
+      seasons: null == seasons
+          ? _self._seasons
+          : seasons // ignore: cast_nullable_to_non_nullable
+              as List<Season>,
       videoAsset: freezed == videoAsset
           ? _self.videoAsset
           : videoAsset // ignore: cast_nullable_to_non_nullable
@@ -2206,8 +2241,10 @@ class __$ContentCopyWithImpl<$Res> implements _$ContentCopyWith<$Res> {
 /// @nodoc
 mixin _$CastMember {
   String get id;
+  @JsonKey(name: 'name')
   String get personName;
   String get role;
+  @JsonKey(name: 'character')
   String? get characterName;
   String? get photoUrl;
   int? get sortOrder;
@@ -2258,9 +2295,9 @@ abstract mixin class $CastMemberCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String personName,
+      @JsonKey(name: 'name') String personName,
       String role,
-      String? characterName,
+      @JsonKey(name: 'character') String? characterName,
       String? photoUrl,
       int? sortOrder});
 }
@@ -2406,8 +2443,13 @@ extension CastMemberPatterns on CastMember {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String personName, String role,
-            String? characterName, String? photoUrl, int? sortOrder)?
+    TResult Function(
+            String id,
+            @JsonKey(name: 'name') String personName,
+            String role,
+            @JsonKey(name: 'character') String? characterName,
+            String? photoUrl,
+            int? sortOrder)?
         $default, {
     required TResult orElse(),
   }) {
@@ -2436,8 +2478,13 @@ extension CastMemberPatterns on CastMember {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String personName, String role,
-            String? characterName, String? photoUrl, int? sortOrder)
+    TResult Function(
+            String id,
+            @JsonKey(name: 'name') String personName,
+            String role,
+            @JsonKey(name: 'character') String? characterName,
+            String? photoUrl,
+            int? sortOrder)
         $default,
   ) {
     final _that = this;
@@ -2464,8 +2511,13 @@ extension CastMemberPatterns on CastMember {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String personName, String role,
-            String? characterName, String? photoUrl, int? sortOrder)?
+    TResult? Function(
+            String id,
+            @JsonKey(name: 'name') String personName,
+            String role,
+            @JsonKey(name: 'character') String? characterName,
+            String? photoUrl,
+            int? sortOrder)?
         $default,
   ) {
     final _that = this;
@@ -2483,10 +2535,10 @@ extension CastMemberPatterns on CastMember {
 @JsonSerializable()
 class _CastMember extends CastMember {
   const _CastMember(
-      {required this.id,
-      required this.personName,
-      required this.role,
-      this.characterName,
+      {this.id = '',
+      @JsonKey(name: 'name') this.personName = '',
+      this.role = '',
+      @JsonKey(name: 'character') this.characterName,
       this.photoUrl,
       this.sortOrder})
       : super._();
@@ -2494,12 +2546,16 @@ class _CastMember extends CastMember {
       _$CastMemberFromJson(json);
 
   @override
+  @JsonKey()
   final String id;
   @override
+  @JsonKey(name: 'name')
   final String personName;
   @override
+  @JsonKey()
   final String role;
   @override
+  @JsonKey(name: 'character')
   final String? characterName;
   @override
   final String? photoUrl;
@@ -2559,9 +2615,9 @@ abstract mixin class _$CastMemberCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String personName,
+      @JsonKey(name: 'name') String personName,
       String role,
-      String? characterName,
+      @JsonKey(name: 'character') String? characterName,
       String? photoUrl,
       int? sortOrder});
 }
@@ -5561,8 +5617,11 @@ class __$AudioTrackCopyWithImpl<$Res> implements _$AudioTrackCopyWith<$Res> {
 
 /// @nodoc
 mixin _$WatchProgress {
+  @JsonKey(name: 'positionSeconds')
   int get watchedSeconds;
+  @JsonKey(name: 'durationSeconds')
   int get totalSeconds;
+  @JsonKey(name: 'percentage')
   double get completionPct;
   bool? get isCompleted;
   DateTime? get lastWatchedAt;
@@ -5613,9 +5672,9 @@ abstract mixin class $WatchProgressCopyWith<$Res> {
       _$WatchProgressCopyWithImpl;
   @useResult
   $Res call(
-      {int watchedSeconds,
-      int totalSeconds,
-      double completionPct,
+      {@JsonKey(name: 'positionSeconds') int watchedSeconds,
+      @JsonKey(name: 'durationSeconds') int totalSeconds,
+      @JsonKey(name: 'percentage') double completionPct,
       bool? isCompleted,
       DateTime? lastWatchedAt});
 }
@@ -5757,8 +5816,12 @@ extension WatchProgressPatterns on WatchProgress {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int watchedSeconds, int totalSeconds, double completionPct,
-            bool? isCompleted, DateTime? lastWatchedAt)?
+    TResult Function(
+            @JsonKey(name: 'positionSeconds') int watchedSeconds,
+            @JsonKey(name: 'durationSeconds') int totalSeconds,
+            @JsonKey(name: 'percentage') double completionPct,
+            bool? isCompleted,
+            DateTime? lastWatchedAt)?
         $default, {
     required TResult orElse(),
   }) {
@@ -5787,8 +5850,12 @@ extension WatchProgressPatterns on WatchProgress {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int watchedSeconds, int totalSeconds, double completionPct,
-            bool? isCompleted, DateTime? lastWatchedAt)
+    TResult Function(
+            @JsonKey(name: 'positionSeconds') int watchedSeconds,
+            @JsonKey(name: 'durationSeconds') int totalSeconds,
+            @JsonKey(name: 'percentage') double completionPct,
+            bool? isCompleted,
+            DateTime? lastWatchedAt)
         $default,
   ) {
     final _that = this;
@@ -5815,8 +5882,12 @@ extension WatchProgressPatterns on WatchProgress {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int watchedSeconds, int totalSeconds,
-            double completionPct, bool? isCompleted, DateTime? lastWatchedAt)?
+    TResult? Function(
+            @JsonKey(name: 'positionSeconds') int watchedSeconds,
+            @JsonKey(name: 'durationSeconds') int totalSeconds,
+            @JsonKey(name: 'percentage') double completionPct,
+            bool? isCompleted,
+            DateTime? lastWatchedAt)?
         $default,
   ) {
     final _that = this;
@@ -5834,19 +5905,22 @@ extension WatchProgressPatterns on WatchProgress {
 @JsonSerializable()
 class _WatchProgress implements WatchProgress {
   const _WatchProgress(
-      {required this.watchedSeconds,
-      required this.totalSeconds,
-      required this.completionPct,
+      {@JsonKey(name: 'positionSeconds') this.watchedSeconds = 0,
+      @JsonKey(name: 'durationSeconds') this.totalSeconds = 0,
+      @JsonKey(name: 'percentage') this.completionPct = 0,
       this.isCompleted,
       this.lastWatchedAt});
   factory _WatchProgress.fromJson(Map<String, dynamic> json) =>
       _$WatchProgressFromJson(json);
 
   @override
+  @JsonKey(name: 'positionSeconds')
   final int watchedSeconds;
   @override
+  @JsonKey(name: 'durationSeconds')
   final int totalSeconds;
   @override
+  @JsonKey(name: 'percentage')
   final double completionPct;
   @override
   final bool? isCompleted;
@@ -5905,9 +5979,9 @@ abstract mixin class _$WatchProgressCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int watchedSeconds,
-      int totalSeconds,
-      double completionPct,
+      {@JsonKey(name: 'positionSeconds') int watchedSeconds,
+      @JsonKey(name: 'durationSeconds') int totalSeconds,
+      @JsonKey(name: 'percentage') double completionPct,
       bool? isCompleted,
       DateTime? lastWatchedAt});
 }
@@ -5962,6 +6036,7 @@ mixin _$LiveStream {
   String get title;
   String get status;
   String get streamType;
+  @JsonKey(name: 'monetizationModel')
   String get accessTier;
   String? get description;
   String? get thumbnailUrl;
@@ -5969,6 +6044,7 @@ mixin _$LiveStream {
   String? get youTubeLiveId;
   String? get vimeoEventId;
   double? get ppvPrice;
+  @JsonKey(name: 'viewerCount')
   int? get currentViewers;
   int? get totalViewers;
   DateTime? get scheduledAt;
@@ -6063,14 +6139,14 @@ abstract mixin class $LiveStreamCopyWith<$Res> {
       String title,
       String status,
       String streamType,
-      String accessTier,
+      @JsonKey(name: 'monetizationModel') String accessTier,
       String? description,
       String? thumbnailUrl,
       String? playbackUrl,
       String? youTubeLiveId,
       String? vimeoEventId,
       double? ppvPrice,
-      int? currentViewers,
+      @JsonKey(name: 'viewerCount') int? currentViewers,
       int? totalViewers,
       DateTime? scheduledAt,
       DateTime? startedAt,
@@ -6279,14 +6355,14 @@ extension LiveStreamPatterns on LiveStream {
             String title,
             String status,
             String streamType,
-            String accessTier,
+            @JsonKey(name: 'monetizationModel') String accessTier,
             String? description,
             String? thumbnailUrl,
             String? playbackUrl,
             String? youTubeLiveId,
             String? vimeoEventId,
             double? ppvPrice,
-            int? currentViewers,
+            @JsonKey(name: 'viewerCount') int? currentViewers,
             int? totalViewers,
             DateTime? scheduledAt,
             DateTime? startedAt,
@@ -6341,14 +6417,14 @@ extension LiveStreamPatterns on LiveStream {
             String title,
             String status,
             String streamType,
-            String accessTier,
+            @JsonKey(name: 'monetizationModel') String accessTier,
             String? description,
             String? thumbnailUrl,
             String? playbackUrl,
             String? youTubeLiveId,
             String? vimeoEventId,
             double? ppvPrice,
-            int? currentViewers,
+            @JsonKey(name: 'viewerCount') int? currentViewers,
             int? totalViewers,
             DateTime? scheduledAt,
             DateTime? startedAt,
@@ -6401,14 +6477,14 @@ extension LiveStreamPatterns on LiveStream {
             String title,
             String status,
             String streamType,
-            String accessTier,
+            @JsonKey(name: 'monetizationModel') String accessTier,
             String? description,
             String? thumbnailUrl,
             String? playbackUrl,
             String? youTubeLiveId,
             String? vimeoEventId,
             double? ppvPrice,
-            int? currentViewers,
+            @JsonKey(name: 'viewerCount') int? currentViewers,
             int? totalViewers,
             DateTime? scheduledAt,
             DateTime? startedAt,
@@ -6450,15 +6526,15 @@ class _LiveStream extends LiveStream {
       {required this.id,
       required this.title,
       required this.status,
-      required this.streamType,
-      required this.accessTier,
+      this.streamType = '',
+      @JsonKey(name: 'monetizationModel') this.accessTier = 'free',
       this.description,
       this.thumbnailUrl,
       this.playbackUrl,
       this.youTubeLiveId,
       this.vimeoEventId,
       this.ppvPrice,
-      this.currentViewers,
+      @JsonKey(name: 'viewerCount') this.currentViewers,
       this.totalViewers,
       this.scheduledAt,
       this.startedAt,
@@ -6475,8 +6551,10 @@ class _LiveStream extends LiveStream {
   @override
   final String status;
   @override
+  @JsonKey()
   final String streamType;
   @override
+  @JsonKey(name: 'monetizationModel')
   final String accessTier;
   @override
   final String? description;
@@ -6491,6 +6569,7 @@ class _LiveStream extends LiveStream {
   @override
   final double? ppvPrice;
   @override
+  @JsonKey(name: 'viewerCount')
   final int? currentViewers;
   @override
   final int? totalViewers;
@@ -6597,14 +6676,14 @@ abstract mixin class _$LiveStreamCopyWith<$Res>
       String title,
       String status,
       String streamType,
-      String accessTier,
+      @JsonKey(name: 'monetizationModel') String accessTier,
       String? description,
       String? thumbnailUrl,
       String? playbackUrl,
       String? youTubeLiveId,
       String? vimeoEventId,
       double? ppvPrice,
-      int? currentViewers,
+      @JsonKey(name: 'viewerCount') int? currentViewers,
       int? totalViewers,
       DateTime? scheduledAt,
       DateTime? startedAt,
@@ -6722,6 +6801,8 @@ mixin _$SubscriptionPlan {
   double get price;
   String get currency;
   String get billingCycle;
+  String? get description;
+  bool get isPopular;
   int? get trialDays;
   int? get maxProfiles;
   int? get maxDevices;
@@ -6754,6 +6835,10 @@ mixin _$SubscriptionPlan {
                 other.currency == currency) &&
             (identical(other.billingCycle, billingCycle) ||
                 other.billingCycle == billingCycle) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.isPopular, isPopular) ||
+                other.isPopular == isPopular) &&
             (identical(other.trialDays, trialDays) ||
                 other.trialDays == trialDays) &&
             (identical(other.maxProfiles, maxProfiles) ||
@@ -6779,6 +6864,8 @@ mixin _$SubscriptionPlan {
       price,
       currency,
       billingCycle,
+      description,
+      isPopular,
       trialDays,
       maxProfiles,
       maxDevices,
@@ -6790,7 +6877,7 @@ mixin _$SubscriptionPlan {
 
   @override
   String toString() {
-    return 'SubscriptionPlan(id: $id, name: $name, price: $price, currency: $currency, billingCycle: $billingCycle, trialDays: $trialDays, maxProfiles: $maxProfiles, maxDevices: $maxDevices, maxQuality: $maxQuality, allowDownload: $allowDownload, adFree: $adFree, features: $features, isActive: $isActive)';
+    return 'SubscriptionPlan(id: $id, name: $name, price: $price, currency: $currency, billingCycle: $billingCycle, description: $description, isPopular: $isPopular, trialDays: $trialDays, maxProfiles: $maxProfiles, maxDevices: $maxDevices, maxQuality: $maxQuality, allowDownload: $allowDownload, adFree: $adFree, features: $features, isActive: $isActive)';
   }
 }
 
@@ -6806,6 +6893,8 @@ abstract mixin class $SubscriptionPlanCopyWith<$Res> {
       double price,
       String currency,
       String billingCycle,
+      String? description,
+      bool isPopular,
       int? trialDays,
       int? maxProfiles,
       int? maxDevices,
@@ -6834,6 +6923,8 @@ class _$SubscriptionPlanCopyWithImpl<$Res>
     Object? price = null,
     Object? currency = null,
     Object? billingCycle = null,
+    Object? description = freezed,
+    Object? isPopular = null,
     Object? trialDays = freezed,
     Object? maxProfiles = freezed,
     Object? maxDevices = freezed,
@@ -6864,6 +6955,14 @@ class _$SubscriptionPlanCopyWithImpl<$Res>
           ? _self.billingCycle
           : billingCycle // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPopular: null == isPopular
+          ? _self.isPopular
+          : isPopular // ignore: cast_nullable_to_non_nullable
+              as bool,
       trialDays: freezed == trialDays
           ? _self.trialDays
           : trialDays // ignore: cast_nullable_to_non_nullable
@@ -6999,6 +7098,8 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
             double price,
             String currency,
             String billingCycle,
+            String? description,
+            bool isPopular,
             int? trialDays,
             int? maxProfiles,
             int? maxDevices,
@@ -7019,6 +7120,8 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
             _that.price,
             _that.currency,
             _that.billingCycle,
+            _that.description,
+            _that.isPopular,
             _that.trialDays,
             _that.maxProfiles,
             _that.maxDevices,
@@ -7053,6 +7156,8 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
             double price,
             String currency,
             String billingCycle,
+            String? description,
+            bool isPopular,
             int? trialDays,
             int? maxProfiles,
             int? maxDevices,
@@ -7072,6 +7177,8 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
             _that.price,
             _that.currency,
             _that.billingCycle,
+            _that.description,
+            _that.isPopular,
             _that.trialDays,
             _that.maxProfiles,
             _that.maxDevices,
@@ -7105,6 +7212,8 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
             double price,
             String currency,
             String billingCycle,
+            String? description,
+            bool isPopular,
             int? trialDays,
             int? maxProfiles,
             int? maxDevices,
@@ -7124,6 +7233,8 @@ extension SubscriptionPlanPatterns on SubscriptionPlan {
             _that.price,
             _that.currency,
             _that.billingCycle,
+            _that.description,
+            _that.isPopular,
             _that.trialDays,
             _that.maxProfiles,
             _that.maxDevices,
@@ -7147,6 +7258,8 @@ class _SubscriptionPlan extends SubscriptionPlan {
       required this.price,
       required this.currency,
       required this.billingCycle,
+      this.description,
+      this.isPopular = false,
       this.trialDays,
       this.maxProfiles,
       this.maxDevices,
@@ -7170,6 +7283,11 @@ class _SubscriptionPlan extends SubscriptionPlan {
   final String currency;
   @override
   final String billingCycle;
+  @override
+  final String? description;
+  @override
+  @JsonKey()
+  final bool isPopular;
   @override
   final int? trialDays;
   @override
@@ -7222,6 +7340,10 @@ class _SubscriptionPlan extends SubscriptionPlan {
                 other.currency == currency) &&
             (identical(other.billingCycle, billingCycle) ||
                 other.billingCycle == billingCycle) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.isPopular, isPopular) ||
+                other.isPopular == isPopular) &&
             (identical(other.trialDays, trialDays) ||
                 other.trialDays == trialDays) &&
             (identical(other.maxProfiles, maxProfiles) ||
@@ -7247,6 +7369,8 @@ class _SubscriptionPlan extends SubscriptionPlan {
       price,
       currency,
       billingCycle,
+      description,
+      isPopular,
       trialDays,
       maxProfiles,
       maxDevices,
@@ -7258,7 +7382,7 @@ class _SubscriptionPlan extends SubscriptionPlan {
 
   @override
   String toString() {
-    return 'SubscriptionPlan(id: $id, name: $name, price: $price, currency: $currency, billingCycle: $billingCycle, trialDays: $trialDays, maxProfiles: $maxProfiles, maxDevices: $maxDevices, maxQuality: $maxQuality, allowDownload: $allowDownload, adFree: $adFree, features: $features, isActive: $isActive)';
+    return 'SubscriptionPlan(id: $id, name: $name, price: $price, currency: $currency, billingCycle: $billingCycle, description: $description, isPopular: $isPopular, trialDays: $trialDays, maxProfiles: $maxProfiles, maxDevices: $maxDevices, maxQuality: $maxQuality, allowDownload: $allowDownload, adFree: $adFree, features: $features, isActive: $isActive)';
   }
 }
 
@@ -7276,6 +7400,8 @@ abstract mixin class _$SubscriptionPlanCopyWith<$Res>
       double price,
       String currency,
       String billingCycle,
+      String? description,
+      bool isPopular,
       int? trialDays,
       int? maxProfiles,
       int? maxDevices,
@@ -7304,6 +7430,8 @@ class __$SubscriptionPlanCopyWithImpl<$Res>
     Object? price = null,
     Object? currency = null,
     Object? billingCycle = null,
+    Object? description = freezed,
+    Object? isPopular = null,
     Object? trialDays = freezed,
     Object? maxProfiles = freezed,
     Object? maxDevices = freezed,
@@ -7334,6 +7462,14 @@ class __$SubscriptionPlanCopyWithImpl<$Res>
           ? _self.billingCycle
           : billingCycle // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPopular: null == isPopular
+          ? _self.isPopular
+          : isPopular // ignore: cast_nullable_to_non_nullable
+              as bool,
       trialDays: freezed == trialDays
           ? _self.trialDays
           : trialDays // ignore: cast_nullable_to_non_nullable
@@ -7846,13 +7982,17 @@ class __$UserSubscriptionCopyWithImpl<$Res>
 /// @nodoc
 mixin _$UserProfile {
   String get id;
+  @JsonKey(name: 'name')
   String get displayName;
   String? get avatarUrl;
   String? get avatarColor;
   bool? get isKids;
+  @JsonKey(name: 'maturityLevel')
   String? get maxContentRating;
   String? get languageCode;
   bool? get isDefault;
+  @JsonKey(name: 'isPinLocked')
+  bool? get isPinLocked;
   int? get dailyTimeLimitMinutes;
 
   /// Create a copy of UserProfile
@@ -7884,6 +8024,8 @@ mixin _$UserProfile {
                 other.languageCode == languageCode) &&
             (identical(other.isDefault, isDefault) ||
                 other.isDefault == isDefault) &&
+            (identical(other.isPinLocked, isPinLocked) ||
+                other.isPinLocked == isPinLocked) &&
             (identical(other.dailyTimeLimitMinutes, dailyTimeLimitMinutes) ||
                 other.dailyTimeLimitMinutes == dailyTimeLimitMinutes));
   }
@@ -7900,11 +8042,12 @@ mixin _$UserProfile {
       maxContentRating,
       languageCode,
       isDefault,
+      isPinLocked,
       dailyTimeLimitMinutes);
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, displayName: $displayName, avatarUrl: $avatarUrl, avatarColor: $avatarColor, isKids: $isKids, maxContentRating: $maxContentRating, languageCode: $languageCode, isDefault: $isDefault, dailyTimeLimitMinutes: $dailyTimeLimitMinutes)';
+    return 'UserProfile(id: $id, displayName: $displayName, avatarUrl: $avatarUrl, avatarColor: $avatarColor, isKids: $isKids, maxContentRating: $maxContentRating, languageCode: $languageCode, isDefault: $isDefault, isPinLocked: $isPinLocked, dailyTimeLimitMinutes: $dailyTimeLimitMinutes)';
   }
 }
 
@@ -7916,13 +8059,14 @@ abstract mixin class $UserProfileCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String displayName,
+      @JsonKey(name: 'name') String displayName,
       String? avatarUrl,
       String? avatarColor,
       bool? isKids,
-      String? maxContentRating,
+      @JsonKey(name: 'maturityLevel') String? maxContentRating,
       String? languageCode,
       bool? isDefault,
+      @JsonKey(name: 'isPinLocked') bool? isPinLocked,
       int? dailyTimeLimitMinutes});
 }
 
@@ -7946,6 +8090,7 @@ class _$UserProfileCopyWithImpl<$Res> implements $UserProfileCopyWith<$Res> {
     Object? maxContentRating = freezed,
     Object? languageCode = freezed,
     Object? isDefault = freezed,
+    Object? isPinLocked = freezed,
     Object? dailyTimeLimitMinutes = freezed,
   }) {
     return _then(_self.copyWith(
@@ -7980,6 +8125,10 @@ class _$UserProfileCopyWithImpl<$Res> implements $UserProfileCopyWith<$Res> {
       isDefault: freezed == isDefault
           ? _self.isDefault
           : isDefault // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isPinLocked: freezed == isPinLocked
+          ? _self.isPinLocked
+          : isPinLocked // ignore: cast_nullable_to_non_nullable
               as bool?,
       dailyTimeLimitMinutes: freezed == dailyTimeLimitMinutes
           ? _self.dailyTimeLimitMinutes
@@ -8084,13 +8233,14 @@ extension UserProfilePatterns on UserProfile {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             String id,
-            String displayName,
+            @JsonKey(name: 'name') String displayName,
             String? avatarUrl,
             String? avatarColor,
             bool? isKids,
-            String? maxContentRating,
+            @JsonKey(name: 'maturityLevel') String? maxContentRating,
             String? languageCode,
             bool? isDefault,
+            @JsonKey(name: 'isPinLocked') bool? isPinLocked,
             int? dailyTimeLimitMinutes)?
         $default, {
     required TResult orElse(),
@@ -8107,6 +8257,7 @@ extension UserProfilePatterns on UserProfile {
             _that.maxContentRating,
             _that.languageCode,
             _that.isDefault,
+            _that.isPinLocked,
             _that.dailyTimeLimitMinutes);
       case _:
         return orElse();
@@ -8130,13 +8281,14 @@ extension UserProfilePatterns on UserProfile {
   TResult when<TResult extends Object?>(
     TResult Function(
             String id,
-            String displayName,
+            @JsonKey(name: 'name') String displayName,
             String? avatarUrl,
             String? avatarColor,
             bool? isKids,
-            String? maxContentRating,
+            @JsonKey(name: 'maturityLevel') String? maxContentRating,
             String? languageCode,
             bool? isDefault,
+            @JsonKey(name: 'isPinLocked') bool? isPinLocked,
             int? dailyTimeLimitMinutes)
         $default,
   ) {
@@ -8152,6 +8304,7 @@ extension UserProfilePatterns on UserProfile {
             _that.maxContentRating,
             _that.languageCode,
             _that.isDefault,
+            _that.isPinLocked,
             _that.dailyTimeLimitMinutes);
       case _:
         throw StateError('Unexpected subclass');
@@ -8174,13 +8327,14 @@ extension UserProfilePatterns on UserProfile {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             String id,
-            String displayName,
+            @JsonKey(name: 'name') String displayName,
             String? avatarUrl,
             String? avatarColor,
             bool? isKids,
-            String? maxContentRating,
+            @JsonKey(name: 'maturityLevel') String? maxContentRating,
             String? languageCode,
             bool? isDefault,
+            @JsonKey(name: 'isPinLocked') bool? isPinLocked,
             int? dailyTimeLimitMinutes)?
         $default,
   ) {
@@ -8196,6 +8350,7 @@ extension UserProfilePatterns on UserProfile {
             _that.maxContentRating,
             _that.languageCode,
             _that.isDefault,
+            _that.isPinLocked,
             _that.dailyTimeLimitMinutes);
       case _:
         return null;
@@ -8208,13 +8363,14 @@ extension UserProfilePatterns on UserProfile {
 class _UserProfile extends UserProfile {
   const _UserProfile(
       {required this.id,
-      required this.displayName,
+      @JsonKey(name: 'name') this.displayName = '',
       this.avatarUrl,
       this.avatarColor,
       this.isKids,
-      this.maxContentRating,
+      @JsonKey(name: 'maturityLevel') this.maxContentRating,
       this.languageCode,
       this.isDefault,
+      @JsonKey(name: 'isPinLocked') this.isPinLocked,
       this.dailyTimeLimitMinutes})
       : super._();
   factory _UserProfile.fromJson(Map<String, dynamic> json) =>
@@ -8223,6 +8379,7 @@ class _UserProfile extends UserProfile {
   @override
   final String id;
   @override
+  @JsonKey(name: 'name')
   final String displayName;
   @override
   final String? avatarUrl;
@@ -8231,11 +8388,15 @@ class _UserProfile extends UserProfile {
   @override
   final bool? isKids;
   @override
+  @JsonKey(name: 'maturityLevel')
   final String? maxContentRating;
   @override
   final String? languageCode;
   @override
   final bool? isDefault;
+  @override
+  @JsonKey(name: 'isPinLocked')
+  final bool? isPinLocked;
   @override
   final int? dailyTimeLimitMinutes;
 
@@ -8273,6 +8434,8 @@ class _UserProfile extends UserProfile {
                 other.languageCode == languageCode) &&
             (identical(other.isDefault, isDefault) ||
                 other.isDefault == isDefault) &&
+            (identical(other.isPinLocked, isPinLocked) ||
+                other.isPinLocked == isPinLocked) &&
             (identical(other.dailyTimeLimitMinutes, dailyTimeLimitMinutes) ||
                 other.dailyTimeLimitMinutes == dailyTimeLimitMinutes));
   }
@@ -8289,11 +8452,12 @@ class _UserProfile extends UserProfile {
       maxContentRating,
       languageCode,
       isDefault,
+      isPinLocked,
       dailyTimeLimitMinutes);
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, displayName: $displayName, avatarUrl: $avatarUrl, avatarColor: $avatarColor, isKids: $isKids, maxContentRating: $maxContentRating, languageCode: $languageCode, isDefault: $isDefault, dailyTimeLimitMinutes: $dailyTimeLimitMinutes)';
+    return 'UserProfile(id: $id, displayName: $displayName, avatarUrl: $avatarUrl, avatarColor: $avatarColor, isKids: $isKids, maxContentRating: $maxContentRating, languageCode: $languageCode, isDefault: $isDefault, isPinLocked: $isPinLocked, dailyTimeLimitMinutes: $dailyTimeLimitMinutes)';
   }
 }
 
@@ -8307,13 +8471,14 @@ abstract mixin class _$UserProfileCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String displayName,
+      @JsonKey(name: 'name') String displayName,
       String? avatarUrl,
       String? avatarColor,
       bool? isKids,
-      String? maxContentRating,
+      @JsonKey(name: 'maturityLevel') String? maxContentRating,
       String? languageCode,
       bool? isDefault,
+      @JsonKey(name: 'isPinLocked') bool? isPinLocked,
       int? dailyTimeLimitMinutes});
 }
 
@@ -8337,6 +8502,7 @@ class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
     Object? maxContentRating = freezed,
     Object? languageCode = freezed,
     Object? isDefault = freezed,
+    Object? isPinLocked = freezed,
     Object? dailyTimeLimitMinutes = freezed,
   }) {
     return _then(_UserProfile(
@@ -8371,6 +8537,10 @@ class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
       isDefault: freezed == isDefault
           ? _self.isDefault
           : isDefault // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      isPinLocked: freezed == isPinLocked
+          ? _self.isPinLocked
+          : isPinLocked // ignore: cast_nullable_to_non_nullable
               as bool?,
       dailyTimeLimitMinutes: freezed == dailyTimeLimitMinutes
           ? _self.dailyTimeLimitMinutes

@@ -7,21 +7,25 @@ class AuthRepository {
 
   Future<AuthResult> login({required String email, required String password}) async {
     final resp = await _api.login(email: email, password: password);
+    await _api.saveSession(resp);
     return AuthResult.fromJson(resp);
   }
 
   Future<AuthResult> register({required String name, required String email, required String password, String? phone}) async {
     final resp = await _api.register(name: name, email: email, password: password, phone: phone);
+    await _api.saveSession(resp);
     return AuthResult.fromJson(resp);
   }
 
   Future<UserProfile> socialLogin({required String provider, required String token}) async {
     final resp = await _api.socialLogin(provider: provider, token: token);
+    await _api.saveSession(resp);
     return UserProfile.fromJson(resp['user']);
   }
 
   Future<UserProfile> verifyOtp({required String email, required String otp}) async {
     final resp = await _api.verifyOtp(email: email, otp: otp);
+    await _api.saveSession(resp);
     return UserProfile.fromJson(resp['user']);
   }
 
@@ -35,6 +39,7 @@ class AuthRepository {
 
   Future<void> logout() async {
     await _api.logout();
+    await _api.clearSession();
   }
 
   Future<UserProfile?> getCurrentUser() async {

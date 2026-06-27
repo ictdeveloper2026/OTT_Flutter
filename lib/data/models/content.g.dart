@@ -81,6 +81,10 @@ _Content _$ContentFromJson(Map<String, dynamic> json) => _Content(
       seriesInfo: json['seriesInfo'] == null
           ? null
           : SeriesInfo.fromJson(json['seriesInfo'] as Map<String, dynamic>),
+      seasons: (json['seasons'] as List<dynamic>?)
+              ?.map((e) => Season.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <Season>[],
       videoAsset: json['videoAsset'] == null
           ? null
           : VideoAsset.fromJson(json['videoAsset'] as Map<String, dynamic>),
@@ -130,6 +134,7 @@ Map<String, dynamic> _$ContentToJson(_Content instance) => <String, dynamic>{
       'genres': instance.genres,
       'cast': instance.cast,
       'seriesInfo': instance.seriesInfo,
+      'seasons': instance.seasons,
       'videoAsset': instance.videoAsset,
       'subtitles': instance.subtitles,
       'audioTracks': instance.audioTracks,
@@ -141,10 +146,10 @@ Map<String, dynamic> _$ContentToJson(_Content instance) => <String, dynamic>{
     };
 
 _CastMember _$CastMemberFromJson(Map<String, dynamic> json) => _CastMember(
-      id: json['id'] as String,
-      personName: json['personName'] as String,
-      role: json['role'] as String,
-      characterName: json['characterName'] as String?,
+      id: json['id'] as String? ?? '',
+      personName: json['name'] as String? ?? '',
+      role: json['role'] as String? ?? '',
+      characterName: json['character'] as String?,
       photoUrl: json['photoUrl'] as String?,
       sortOrder: (json['sortOrder'] as num?)?.toInt(),
     );
@@ -152,9 +157,9 @@ _CastMember _$CastMemberFromJson(Map<String, dynamic> json) => _CastMember(
 Map<String, dynamic> _$CastMemberToJson(_CastMember instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'personName': instance.personName,
+      'name': instance.personName,
       'role': instance.role,
-      'characterName': instance.characterName,
+      'character': instance.characterName,
       'photoUrl': instance.photoUrl,
       'sortOrder': instance.sortOrder,
     };
@@ -297,9 +302,9 @@ Map<String, dynamic> _$AudioTrackToJson(_AudioTrack instance) =>
 
 _WatchProgress _$WatchProgressFromJson(Map<String, dynamic> json) =>
     _WatchProgress(
-      watchedSeconds: (json['watchedSeconds'] as num).toInt(),
-      totalSeconds: (json['totalSeconds'] as num).toInt(),
-      completionPct: (json['completionPct'] as num).toDouble(),
+      watchedSeconds: (json['positionSeconds'] as num?)?.toInt() ?? 0,
+      totalSeconds: (json['durationSeconds'] as num?)?.toInt() ?? 0,
+      completionPct: (json['percentage'] as num?)?.toDouble() ?? 0,
       isCompleted: json['isCompleted'] as bool?,
       lastWatchedAt: json['lastWatchedAt'] == null
           ? null
@@ -308,9 +313,9 @@ _WatchProgress _$WatchProgressFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$WatchProgressToJson(_WatchProgress instance) =>
     <String, dynamic>{
-      'watchedSeconds': instance.watchedSeconds,
-      'totalSeconds': instance.totalSeconds,
-      'completionPct': instance.completionPct,
+      'positionSeconds': instance.watchedSeconds,
+      'durationSeconds': instance.totalSeconds,
+      'percentage': instance.completionPct,
       'isCompleted': instance.isCompleted,
       'lastWatchedAt': instance.lastWatchedAt?.toIso8601String(),
     };
@@ -319,15 +324,15 @@ _LiveStream _$LiveStreamFromJson(Map<String, dynamic> json) => _LiveStream(
       id: json['id'] as String,
       title: json['title'] as String,
       status: json['status'] as String,
-      streamType: json['streamType'] as String,
-      accessTier: json['accessTier'] as String,
+      streamType: json['streamType'] as String? ?? '',
+      accessTier: json['monetizationModel'] as String? ?? 'free',
       description: json['description'] as String?,
       thumbnailUrl: json['thumbnailUrl'] as String?,
       playbackUrl: json['playbackUrl'] as String?,
       youTubeLiveId: json['youTubeLiveId'] as String?,
       vimeoEventId: json['vimeoEventId'] as String?,
       ppvPrice: (json['ppvPrice'] as num?)?.toDouble(),
-      currentViewers: (json['currentViewers'] as num?)?.toInt(),
+      currentViewers: (json['viewerCount'] as num?)?.toInt(),
       totalViewers: (json['totalViewers'] as num?)?.toInt(),
       scheduledAt: json['scheduledAt'] == null
           ? null
@@ -345,14 +350,14 @@ Map<String, dynamic> _$LiveStreamToJson(_LiveStream instance) =>
       'title': instance.title,
       'status': instance.status,
       'streamType': instance.streamType,
-      'accessTier': instance.accessTier,
+      'monetizationModel': instance.accessTier,
       'description': instance.description,
       'thumbnailUrl': instance.thumbnailUrl,
       'playbackUrl': instance.playbackUrl,
       'youTubeLiveId': instance.youTubeLiveId,
       'vimeoEventId': instance.vimeoEventId,
       'ppvPrice': instance.ppvPrice,
-      'currentViewers': instance.currentViewers,
+      'viewerCount': instance.currentViewers,
       'totalViewers': instance.totalViewers,
       'scheduledAt': instance.scheduledAt?.toIso8601String(),
       'startedAt': instance.startedAt?.toIso8601String(),
@@ -367,6 +372,8 @@ _SubscriptionPlan _$SubscriptionPlanFromJson(Map<String, dynamic> json) =>
       price: (json['price'] as num).toDouble(),
       currency: json['currency'] as String,
       billingCycle: json['billingCycle'] as String,
+      description: json['description'] as String?,
+      isPopular: json['isPopular'] as bool? ?? false,
       trialDays: (json['trialDays'] as num?)?.toInt(),
       maxProfiles: (json['maxProfiles'] as num?)?.toInt(),
       maxDevices: (json['maxDevices'] as num?)?.toInt(),
@@ -386,6 +393,8 @@ Map<String, dynamic> _$SubscriptionPlanToJson(_SubscriptionPlan instance) =>
       'price': instance.price,
       'currency': instance.currency,
       'billingCycle': instance.billingCycle,
+      'description': instance.description,
+      'isPopular': instance.isPopular,
       'trialDays': instance.trialDays,
       'maxProfiles': instance.maxProfiles,
       'maxDevices': instance.maxDevices,
@@ -420,26 +429,28 @@ Map<String, dynamic> _$UserSubscriptionToJson(_UserSubscription instance) =>
 
 _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
       id: json['id'] as String,
-      displayName: json['displayName'] as String,
+      displayName: json['name'] as String? ?? '',
       avatarUrl: json['avatarUrl'] as String?,
       avatarColor: json['avatarColor'] as String?,
       isKids: json['isKids'] as bool?,
-      maxContentRating: json['maxContentRating'] as String?,
+      maxContentRating: json['maturityLevel'] as String?,
       languageCode: json['languageCode'] as String?,
       isDefault: json['isDefault'] as bool?,
+      isPinLocked: json['isPinLocked'] as bool?,
       dailyTimeLimitMinutes: (json['dailyTimeLimitMinutes'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'displayName': instance.displayName,
+      'name': instance.displayName,
       'avatarUrl': instance.avatarUrl,
       'avatarColor': instance.avatarColor,
       'isKids': instance.isKids,
-      'maxContentRating': instance.maxContentRating,
+      'maturityLevel': instance.maxContentRating,
       'languageCode': instance.languageCode,
       'isDefault': instance.isDefault,
+      'isPinLocked': instance.isPinLocked,
       'dailyTimeLimitMinutes': instance.dailyTimeLimitMinutes,
     };
 
