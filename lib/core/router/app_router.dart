@@ -85,7 +85,7 @@ class AppRouter {
 
       // ── Full-screen routes ──
       GoRoute(path: '/content/:id', builder: (_, state) => ContentDetailScreen(contentId: state.pathParameters['id']!)),
-      GoRoute(path: '/play/:id', builder: (_, state) => VideoPlayerScreen(contentId: int.tryParse(state.pathParameters['id'] ?? '0') ?? 0, startPosition: int.tryParse(state.uri.queryParameters['t'] ?? '0') ?? 0)),
+      GoRoute(path: '/play/:id', builder: (_, state) => VideoPlayerScreen(contentId: state.pathParameters['id'] ?? '', startPosition: int.tryParse(state.uri.queryParameters['t'] ?? '0') ?? 0)),
       GoRoute(path: '/live/play/:id', builder: (_, __) => const PlaceholderScreen('Live player')),
       GoRoute(path: '/genre/:slug', builder: (_, __) => const PlaceholderScreen('Genre')),
       GoRoute(path: '/watch-history', builder: (_, __) => const PlaceholderScreen('Watch history')),

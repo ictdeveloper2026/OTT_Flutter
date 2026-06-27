@@ -3775,7 +3775,7 @@ extension EpisodePatterns on Episode {
 
 /// @nodoc
 @JsonSerializable()
-class _Episode implements Episode {
+class _Episode extends Episode {
   const _Episode(
       {required this.id,
       required this.episodeNumber,
@@ -3784,7 +3784,8 @@ class _Episode implements Episode {
       this.durationSeconds,
       this.thumbnailUrl,
       this.contentId,
-      this.watchProgress});
+      this.watchProgress})
+      : super._();
   factory _Episode.fromJson(Map<String, dynamic> json) =>
       _$EpisodeFromJson(json);
 
@@ -7686,7 +7687,7 @@ extension UserSubscriptionPatterns on UserSubscription {
 
 /// @nodoc
 @JsonSerializable()
-class _UserSubscription implements UserSubscription {
+class _UserSubscription extends UserSubscription {
   const _UserSubscription(
       {required this.id,
       required this.plan,
@@ -7694,7 +7695,8 @@ class _UserSubscription implements UserSubscription {
       required this.startDate,
       required this.endDate,
       this.autoRenew,
-      this.gatewayType});
+      this.gatewayType})
+      : super._();
   factory _UserSubscription.fromJson(Map<String, dynamic> json) =>
       _$UserSubscriptionFromJson(json);
 

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_kit/media_kit.dart';
+import 'package:media_kit/media_kit.dart' hide PlayerState;
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart' hide PlayerState;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -13,12 +13,12 @@ import '../../../core/theme/app_theme.dart';
 import '../../blocs/player/player_bloc.dart';
 import '../../../data/models/content.dart';
 import '../../widgets/player/player_controls.dart';
-import '../../widgets/player/episode_drawer.dart';
+import '../../widgets/episode_drawer.dart';
 import '../../widgets/player/subtitle_selector.dart';
 import '../../widgets/player/quality_selector.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
-  final int contentId;
+  final String contentId;
   final int startPosition;
   const VideoPlayerScreen({super.key, required this.contentId, this.startPosition = 0});
 
@@ -43,7 +43,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.initState();
     WakelockPlus.enable();
     _enterFullscreen();
-    context.read<PlayerBloc>().add(PlayerLoadContentEvent(widget.contentId));
+    context.read<PlayerBloc>().add(PlayerInitialized(contentId: widget.contentId));
   }
 
   void _enterFullscreen() {
@@ -78,8 +78,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void _syncProgress(int seconds) {
     final state = context.read<PlayerBloc>().state;
-    if (state is PlayerPlayingState) {
-      context.read<PlayerBloc>().add(PlayerProgressUpdateEvent(seconds, state.content.durationSeconds ?? 0));
+    if (state is PlayerReady) {
+      context.read<PlayerBloc>().add(PlayerProgressSynced(contentId: state.content.id, position: seconds, duration: state.duration));
     }
   }
 
@@ -115,12 +115,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
     return BlocConsumer<PlayerBloc, PlayerState>(
       listener: (context, state) {
-        if (state is PlayerReadyState) {
-          _playerType = state.videoAsset.playerType;
-          switch (_playerType) {
-            case 'YouTube': _initYouTubePlayer(state.videoAsset.youTubeVideoId!); break;
-            case 'Vimeo': break; // initialized in webview
-            default: _initHLSPlayer(state.signedUrl!);
+        if (state is PlayerReady) {
+          if (state.streamInfo.isYoutube) {
+            _playerType = 'YouTube';
+            _initYouTubePlayer(state.streamInfo.youtubeVideoId ?? '');
+          } else if (state.streamInfo.isVimeo) {
+            _playerType = 'Vimeo';
+          } else {
+            _playerType = 'HLS';
+            _initHLSPlayer(state.streamInfo.url);
           }
         }
       },
@@ -132,7 +135,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             child: Stack(
               children: [
                 _buildVideoView(state),
-                if (state is PlayerPlayingState) ...[
+                if (state is PlayerReady) ...[
                   AnimatedOpacity(
                     opacity: _showControls ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 300),
@@ -153,9 +156,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     ),
                   ),
                 ],
-                if (state is PlayerLoadingState)
+                if (state is PlayerLoading)
                   const Center(child: CircularProgressIndicator(color: Colors.white)),
-                if (state is PlayerErrorState)
+                if (state is PlayerError)
                   Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
                     const Icon(Icons.error_outline, color: Colors.white54, size: 64),
                     const SizedBox(height: 12),
@@ -172,7 +175,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Widget _buildVideoView(PlayerState state) {
-    if (state is! PlayerPlayingState && state is! PlayerReadyState) return const SizedBox.expand(child: ColoredBox(color: Colors.black));
+    if (state is! PlayerReady && state is! PlayerReady) return const SizedBox.expand(child: ColoredBox(color: Colors.black));
 
     switch (_playerType) {
       case 'YouTube':
@@ -185,9 +188,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
       case 'Vimeo':
         final state2 = state;
-        if (state2 is PlayerReadyState) {
+        if (state2 is PlayerReady) {
           return InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri('https://player.vimeo.com/video/${state2.videoAsset.vimeoVideoId}?autoplay=1&byline=0&portrait=0&title=0#t=${widget.startPosition}s')),
+            initialUrlRequest: URLRequest(url: WebUri('https://player.vimeo.com/video/${state2.streamInfo.vimeoVideoId}?autoplay=1&byline=0&portrait=0&title=0#t=${widget.startPosition}s')),
             initialSettings: InAppWebViewSettings(allowsInlineMediaPlayback: true, mediaPlaybackRequiresUserGesture: false, allowsAirPlayForMediaPlayback: true),
             onWebViewCreated: (c) => _vimeoController = c,
           );
@@ -200,30 +203,30 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
-  void _showQualitySelector(BuildContext context, PlayerPlayingState state) {
+  void _showQualitySelector(BuildContext context, PlayerReady state) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => QualitySelector(
-        qualities: state.videoAsset.qualities ?? [],
+        qualities: state.content.videoAsset?.qualities ?? [],
         selectedQuality: state.selectedQuality,
         onSelect: (q) {
-          context.read<PlayerBloc>().add(PlayerChangeQualityEvent(q));
+          context.read<PlayerBloc>().add(PlayerQualityChanged(quality: q));
           Navigator.pop(context);
         },
       ),
     );
   }
 
-  void _showSubtitleSelector(BuildContext context, PlayerPlayingState state) {
+  void _showSubtitleSelector(BuildContext context, PlayerReady state) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => SubtitleSelector(
         subtitles: state.content.subtitles ?? [],
-        selectedId: state.selectedSubtitleId,
+        selectedId: state.selectedSubtitle,
         onSelect: (id) {
-          context.read<PlayerBloc>().add(PlayerChangeSubtitleEvent(id));
+          context.read<PlayerBloc>().add(PlayerSubtitleChanged(subtitle: id));
           Navigator.pop(context);
         },
       ),
@@ -236,11 +239,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => EpisodeDrawer(
-        seriesInfo: (context.read<PlayerBloc>().state as PlayerPlayingState).content.seriesInfo!,
-        currentContentId: widget.contentId,
-        onEpisodeSelect: (contentId) {
+        seasons: (context.read<PlayerBloc>().state as PlayerReady).content.seasons,
+        currentEpisodeId: null,
+        onEpisodeSelected: (ep) {
           Navigator.pop(context);
-          context.pushReplacement('/play/$contentId');
+          context.pushReplacement('/play/${ep.id}');
         },
       ),
     );

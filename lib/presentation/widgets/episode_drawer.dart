@@ -5,7 +5,7 @@ import '../../data/models/content.dart';
 
 class EpisodeDrawer extends StatefulWidget {
   final List<Season> seasons;
-  final Guid? currentEpisodeId;
+  final String? currentEpisodeId;
   final Function(Episode episode) onEpisodeSelected;
 
   const EpisodeDrawer({

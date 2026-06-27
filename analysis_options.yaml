@@ -21,8 +21,6 @@ analyzer:
     # presentation/blocs, core/theme, core/router, presentation/widgets.
     # Pending (still being ported screen-by-screen): presentation/screens, core/di,
     # and the old monolith entry (deleted in M5).
-    - lib/presentation/screens/**
-    - lib/core/di/**
     - lib/main.dart
     - lib/hls_stub.dart
     - lib/hls_web.dart
