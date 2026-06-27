@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/admin/admin_bloc.dart';
-import '../../blocs/admin/admin_event.dart';
 
 // ── Admin Users Screen ─────────────────────────────────────────────────────────
 
@@ -20,7 +19,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<AdminBloc>().add(LoadAdminUsersEvent(page: _page));
+    context.read<AdminBloc>().add(AdminUsersLoaded(page: _page));
   }
 
   @override
@@ -98,7 +97,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 contentPadding: EdgeInsets.zero,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
-              onChanged: (q) => context.read<AdminBloc>().add(LoadAdminUsersEvent(page: 1, search: q)),
+              onChanged: (q) => context.read<AdminBloc>().add(AdminUsersLoaded(page: 1, search: q)),
             ),
           ),
           const SizedBox(width: 12),

@@ -5,8 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/content.dart';
 import '../../blocs/theme/theme_bloc.dart';
-import '../../widgets/common/gradient_button.dart';
-import '../../widgets/common/section_header.dart';
+import '../../widgets/shared_widgets.dart';
 
 class BrandingScreen extends StatefulWidget {
   const BrandingScreen({super.key});
@@ -38,7 +37,8 @@ class _BrandingScreenState extends State<BrandingScreen> {
   @override
   void initState() {
     super.initState();
-    final b = context.read<ThemeBloc>().state.branding;
+    final s = context.read<ThemeBloc>().state;
+    final b = s is ThemeLoaded ? s.branding : BrandingConfig.defaultConfig();
     _branding = b;
     _appNameCtrl = TextEditingController(text: b?.appName ?? 'StreamFlix');
     _taglineCtrl = TextEditingController(text: b?.appTagline ?? '');
@@ -65,8 +65,8 @@ class _BrandingScreenState extends State<BrandingScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     final updated = BrandingConfig(
-      id: _branding?.id ?? 0,
-      tenantId: _branding?.tenantId ?? 1,
+      id: _branding?.id ?? '',
+      tenantId: _branding?.tenantId ?? '',
       appName: _appNameCtrl.text,
       appTagline: _taglineCtrl.text,
       primaryColor: _primaryCtrl.text,
@@ -81,7 +81,7 @@ class _BrandingScreenState extends State<BrandingScreen> {
       logoUrl: _branding?.logoUrl,
       faviconUrl: _branding?.faviconUrl,
     );
-    context.read<ThemeBloc>().add(ThemeSaveEvent(updated));
+    context.read<ThemeBloc>().add(ThemeUpdateRequested(branding: updated));
     setState(() => _saving = false);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: const Text('Branding saved & applied live!'),
@@ -98,7 +98,7 @@ class _BrandingScreenState extends State<BrandingScreen> {
       appBar: AppBar(
         title: const Text('Branding & Theme'),
         actions: [
-          GradientButton(label: 'Save & Apply', onPressed: _save, loading: _saving),
+          GradientButton(label: 'Save & Apply', onPressed: _save, isLoading: _saving),
           const SizedBox(width: 16),
         ],
       ),

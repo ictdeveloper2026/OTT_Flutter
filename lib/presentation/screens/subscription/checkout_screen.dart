@@ -4,7 +4,6 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/content.dart';
 import '../../blocs/subscription/subscription_bloc.dart';
-import '../../blocs/subscription/subscription_event.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final SubscriptionPlan plan;
@@ -38,11 +37,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    context.read<SubscriptionBloc>().add(VerifyPaymentEvent(
+    context.read<SubscriptionBloc>().add(SubscriptionConfirmed(
       orderId: response.orderId ?? '',
       paymentId: response.paymentId ?? '',
       signature: response.signature ?? '',
-      gateway: 'razorpay',
     ));
   }
 
@@ -151,7 +149,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: TextStyle(color: colors.textPrimary, fontSize: 28, fontWeight: FontWeight.bold)),
           Text('per ${widget.plan.billingCycle}', style: TextStyle(color: colors.textSecondary)),
           const SizedBox(height: 16),
-          ...widget.plan.features.map((f) => Padding(
+          ...(widget.plan.features ?? []).map((f) => Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(
               children: [
@@ -313,10 +311,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : () async {
           setState(() => _isLoading = true);
-          context.read<SubscriptionBloc>().add(CreateOrderEvent(
+          context.read<SubscriptionBloc>().add(SubscriptionInitiated(
             planId: widget.plan.id,
             promoCode: _promoCode,
-            gateway: 'razorpay',
           ));
           // The bloc listener will open Razorpay once order is created
           setState(() => _isLoading = false);
