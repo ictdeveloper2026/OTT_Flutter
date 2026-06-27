@@ -21,9 +21,10 @@ analyzer:
     # presentation/blocs, core/theme, core/router, presentation/widgets.
     # Pending (still being ported screen-by-screen): presentation/screens, core/di,
     # and the old monolith entry (deleted in M5).
-    - lib/main.dart
+    # Orphaned by the Path B migration (only the old monolith used these).
     - lib/hls_stub.dart
     - lib/hls_web.dart
+    - lib/main_monolith_legacy.dart.bak
 
 linter:
   # The lint rules applied to this project can be customized in the
