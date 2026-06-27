@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         body: BlocBuilder<ThemeBloc, ThemeState>(
           builder: (context, themeState) {
             final logoUrl = themeState is ThemeLoaded ? themeState.branding.logoUrl : null;
-            final appName = themeState is ThemeLoaded ? themeState.branding.appName : 'StreamVault';
+            final appName = (themeState is ThemeLoaded ? themeState.branding.appName : null) ?? 'StreamVault';
             return Center(
               child: FadeTransition(
                 opacity: _fadeIn,

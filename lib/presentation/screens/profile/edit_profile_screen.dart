@@ -5,9 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/profile/profile_bloc.dart';
-import '../../blocs/profile/profile_event.dart';
-import '../../blocs/profile/profile_state.dart';
-import '../../../data/models/user.dart';
+import '../../../data/models/content.dart';
 import '../../widgets/shared_widgets.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -66,10 +64,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    context.read<ProfileBloc>().add(UpdateProfileEvent(
+    context.read<ProfileBloc>().add(ProfileUpdated(
       name: _nameController.text.trim(),
       avatarUrl: _selectedAvatar,
-      profileId: widget.profile?.id,
+      profileId: widget.profile?.id ?? '',
     ));
   }
 

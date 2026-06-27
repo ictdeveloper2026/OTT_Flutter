@@ -85,6 +85,7 @@ abstract class Content with _$Content {
   }) = _Content;
 
   factory Content.fromJson(Map<String, dynamic> json) => _$ContentFromJson(json);
+  bool get isActive => status == 'published';
   String get contentType => type;
   String? get ageRating => contentRating;
   double? get avgRating => averageRating;
@@ -135,6 +136,7 @@ abstract class Season with _$Season {
 
 @freezed
 abstract class Episode with _$Episode {
+  const Episode._();
   const factory Episode({
     required String id,
     required int episodeNumber,
@@ -146,6 +148,7 @@ abstract class Episode with _$Episode {
     WatchProgress? watchProgress,
   }) = _Episode;
   factory Episode.fromJson(Map<String, dynamic> json) => _$EpisodeFromJson(json);
+  int get durationMinutes => ((durationSeconds ?? 0) / 60).round();
 }
 
 @freezed
@@ -257,11 +260,14 @@ abstract class SubscriptionPlan with _$SubscriptionPlan {
   }) = _SubscriptionPlan;
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) => _$SubscriptionPlanFromJson(json);
   int get intervalMonths => billingCycle.toLowerCase() == 'yearly' ? 12 : 1;
+  String? get description => null;
+  bool get isPopular => false;
 }
 
 // ── User Subscription ──
 @freezed
 abstract class UserSubscription with _$UserSubscription {
+  const UserSubscription._();
   const factory UserSubscription({
     required String id,
     required SubscriptionPlan plan,
@@ -272,6 +278,7 @@ abstract class UserSubscription with _$UserSubscription {
     String? gatewayType,
   }) = _UserSubscription;
   factory UserSubscription.fromJson(Map<String, dynamic> json) => _$UserSubscriptionFromJson(json);
+  String get planId => plan.id;
 }
 
 // ── User Profile ──
@@ -292,6 +299,7 @@ abstract class UserProfile with _$UserProfile {
   factory UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
   String get name => displayName;
   bool get isKid => isKids ?? false;
+  bool get hasPin => false;
 }
 
 // ── Banner ──

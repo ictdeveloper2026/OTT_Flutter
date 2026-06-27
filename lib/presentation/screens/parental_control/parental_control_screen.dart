@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/profile/profile_bloc.dart';
-import '../../blocs/profile/profile_event.dart';
 import '../../widgets/shared_widgets.dart';
 
 class ParentalControlScreen extends StatefulWidget {
@@ -219,10 +218,6 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
 
   void _saveSettings() {
     setState(() => _isLoading = true);
-    context.read<ProfileBloc>().add(UpdateParentalSettingsEvent(
-      maturityLevel: _selectedMaturity,
-      requirePin: _requirePin,
-    ));
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() => _isLoading = false);
