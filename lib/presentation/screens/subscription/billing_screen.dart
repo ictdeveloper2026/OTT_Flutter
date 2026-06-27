@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/subscription/subscription_bloc.dart';
-import '../../blocs/subscription/subscription_event.dart';
-import '../../blocs/subscription/subscription_state.dart';
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -17,7 +15,7 @@ class _BillingScreenState extends State<BillingScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<SubscriptionBloc>().add(LoadPaymentHistoryEvent());
+    context.read<SubscriptionBloc>().add(SubscriptionCurrentLoaded());
   }
 
   @override
@@ -147,7 +145,7 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   Widget _buildPaymentList(OttColors colors, SubscriptionState state) {
-    final payments = state is PaymentHistoryLoaded ? state.payments : _mockPayments;
+    final payments = _mockPayments;
 
     if (payments.isEmpty) {
       return SliverFillRemaining(
@@ -231,7 +229,7 @@ class _BillingScreenState extends State<BillingScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<SubscriptionBloc>().add(CancelSubscriptionEvent());
+              context.read<SubscriptionBloc>().add(SubscriptionCancelled());
             },
             child: const Text('Cancel Plan', style: TextStyle(color: Colors.red)),
           ),

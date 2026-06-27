@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:logger/logger.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -35,9 +37,9 @@ Future<void> configureDependencies() async {
   sl.registerSingleton<Box>(downloadsBox, instanceName: 'downloads');
 
   // Core
-  sl.registerLazySingleton<ApiService>(() => ApiService(
-    settingsBox: sl<Box>(instanceName: 'settings'),
-  ));
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
+  sl.registerLazySingleton(() => Logger());
+  sl.registerLazySingleton<ApiService>(() => ApiService(sl<FlutterSecureStorage>(), sl<Logger>()));
 
   // Repositories
   sl.registerLazySingleton<AuthRepository>(() => AuthRepository(sl<ApiService>()));
