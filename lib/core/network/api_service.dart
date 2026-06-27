@@ -216,6 +216,12 @@ class ApiService {
       _dio.put('/admin/users/$userId/status', data: {'status': status});
   Future<List<dynamic>> adminGetLiveStreams() async => _list(await _dio.get('/admin/live'));
   Future<List<dynamic>> adminGetSubscriptionPlans() async => _list(await _dio.get('/plans'));
+  Future<Map<String, dynamic>> adminCreateContent(Map<String, dynamic> data) async => _map(await _dio.post('/admin/contents', data: data));
+  Future<Map<String, dynamic>> adminUpdateContent(String id, Map<String, dynamic> data) async => _map(await _dio.put('/admin/contents/$id', data: data));
+  Future<void> adminUploadVideo(String contentId, String playerType, String? videoId, {FormData? formData}) =>
+      formData != null
+          ? _dio.post('/admin/contents/$contentId/video', data: formData)
+          : _dio.post('/admin/contents/$contentId/video', data: {'playerType': playerType, 'videoId': videoId});
 }
 
 class _AuthInterceptor extends Interceptor {

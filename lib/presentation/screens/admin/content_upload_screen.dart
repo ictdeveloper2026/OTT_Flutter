@@ -10,13 +10,12 @@ import 'package:percent_indicator/percent_indicator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/network/api_service.dart';
-import '../../widgets/common/gradient_button.dart';
-import '../../widgets/common/section_header.dart';
+import '../../widgets/shared_widgets.dart';
 
 enum VideoSourceType { hls, youtube, vimeo }
 
 class ContentUploadScreen extends StatefulWidget {
-  final int? contentId;
+  final String? contentId;
   const ContentUploadScreen({super.key, this.contentId});
 
   @override
@@ -42,7 +41,7 @@ class _ContentUploadScreenState extends State<ContentUploadScreen> {
   double _uploadProgress = 0;
   bool _uploading = false;
   bool _saving = false;
-  int? _createdContentId;
+  String? _createdContentId;
   String? _uploadStatus;
   List<String> _selectedGenres = [];
 
@@ -74,7 +73,7 @@ class _ContentUploadScreenState extends State<ContentUploadScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
-      final api = getIt<ApiService>();
+      final api = sl<ApiService>();
       final data = {
         'title': _titleCtrl.text,
         'description': _descCtrl.text,
@@ -90,7 +89,7 @@ class _ContentUploadScreenState extends State<ContentUploadScreen> {
       final res = widget.contentId != null
           ? await api.adminUpdateContent(widget.contentId!, data)
           : await api.adminCreateContent(data);
-      _createdContentId = res.data['id'] ?? widget.contentId;
+      _createdContentId = res['id'] ?? widget.contentId;
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Content saved!')));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -107,7 +106,7 @@ class _ContentUploadScreenState extends State<ContentUploadScreen> {
     }
     setState(() { _uploading = true; _uploadProgress = 0; _uploadStatus = 'Uploading...'; });
     try {
-      final api = getIt<ApiService>();
+      final api = sl<ApiService>();
       switch (_videoSource) {
         case VideoSourceType.youtube:
           await api.adminUploadVideo(contentId, 'YouTube', _ytIdCtrl.text);
@@ -142,7 +141,7 @@ class _ContentUploadScreenState extends State<ContentUploadScreen> {
       appBar: AppBar(
         title: Text(widget.contentId == null ? 'Upload Content' : 'Edit Content'),
         actions: [
-          GradientButton(label: 'Save', onPressed: _saveContent, loading: _saving),
+          GradientButton(label: 'Save', onPressed: _saveContent, isLoading: _saving),
           const SizedBox(width: 16),
         ],
       ),
@@ -237,7 +236,7 @@ class _ContentUploadScreenState extends State<ContentUploadScreen> {
               child: GradientButton(
                 label: _uploading ? 'Uploading...' : 'Upload / Link Video',
                 onPressed: _uploading ? null : _uploadVideo,
-                loading: _uploading,
+                isLoading: _uploading,
               ),
             ),
             const SizedBox(height: 40),

@@ -105,6 +105,9 @@ dependencies:
 
   # Video playback (web + mobile)
   video_player: ^2.9.2
+  pin_code_fields: ^8.0.1
+  file_picker: ^8.1.2
+  signalr_netcore: ^1.3.7
   web: ^1.1.0   # used by hls_web.dart for HLS playback on web
   dartz: ^0.10.1
   logger: ^2.4.0

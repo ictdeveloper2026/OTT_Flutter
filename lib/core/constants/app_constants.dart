@@ -5,6 +5,7 @@ class AppConstants {
   static const String appVersion = '1.0.0';
   static const int buildNumber = 1;
   static const String platform = 'flutter';
+  static const String wsBaseUrl = baseUrl;
 
   // API
   // NOTE: backend routes are mounted at /api (NOT /api/v1). Override host with
