@@ -44,11 +44,14 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
   }
 
   Future<void> _onGenreLoaded(ContentGenreLoaded event, Emitter<ContentState> emit) async {
-    emit(ContentLoading());
+    // Capture the list BEFORE emitting loading so load-more (page>1) keeps the list on
+    // screen and appends, instead of flashing a spinner and replacing it.
+    final prevState = state;
+    if (event.page <= 1) emit(ContentLoading());
     try {
       final result = await _repository.getByGenre(event.genreSlug, page: event.page);
-      if (state is ContentGenreLoaded2 && event.page > 1) {
-        final prev = state as ContentGenreLoaded2;
+      if (prevState is ContentGenreLoaded2 && event.page > 1) {
+        final prev = prevState;
         emit(ContentGenreLoaded2(
           genreName: prev.genreName,
           items: [...prev.items, ...result.data],
