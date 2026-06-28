@@ -142,8 +142,13 @@ class ApiService {
 
   Future<void> deleteProfile(String profileId) => _dio.delete('/profiles/$profileId');
 
-  Future<Map<String, dynamic>> selectProfile(String profileId) async =>
-      _map(await _dio.post('/profiles/$profileId/select'));
+  Future<Map<String, dynamic>> selectProfile(String profileId) async {
+    final data = _map(await _dio.post('/profiles/$profileId/select'));
+    // The select response carries a NEW access token with the profile_id claim — persist it,
+    // or every profile-scoped call (watchlist, watch-history, rate) would fail "no active profile".
+    await saveSession(data);
+    return data;
+  }
 
   Future<void> setProfilePin({required String profileId, required String pin}) =>
       _dio.put('/profiles/$profileId/pin', data: {'pin': pin});
@@ -166,9 +171,26 @@ class ApiService {
   Future<Map<String, dynamic>> getByGenre(String genreId, {int page = 1}) async =>
       _paged(await _dio.get('/contents/genre/$genreId', queryParameters: {'page': page}));
 
-  Future<Map<String, dynamic>> getStreamUrl({required String contentId, String? episodeId}) async =>
-      _map(await _dio.get('/contents/$contentId/stream',
-          queryParameters: {if (episodeId != null) 'episodeId': episodeId}));
+  // Backend returns {stream: StreamUrlsDto, streamSessionId, ...}; normalize the nested
+  // StreamUrlsDto (hls/streamProvider/youtubeId/…) into the flat shape StreamInfo.fromJson reads.
+  Future<Map<String, dynamic>> getStreamUrl({required String contentId, String? episodeId}) async {
+    final data = _map(await _dio.get('/contents/$contentId/stream',
+        queryParameters: {if (episodeId != null) 'episodeId': episodeId}));
+    final s = data['stream'] is Map ? Map<String, dynamic>.from(data['stream']) : data;
+    return {
+      'url': s['hls'] ?? s['youtubeUrl'] ?? s['vimeoUrl'] ?? '',
+      'type': s['streamProvider'] ?? 'hls',
+      'youtubeVideoId': s['youtubeId'],
+      'vimeoVideoId': s['vimeoId'],
+      'isDrm': s['drmLicenseUrl'] != null,
+      'drmLicenseUrl': s['drmLicenseUrl'],
+      'qualities': s['qualities'] is Map
+          ? (s['qualities'] as Map).entries.map((e) => {'quality': e.key, 'url': e.value}).toList()
+          : (s['qualities'] ?? const []),
+      'subtitles': s['subtitles'] ?? const [],
+      'streamSessionId': data['streamSessionId'],
+    };
+  }
 
   // ── Watch history / list / ratings ──
   Future<List<dynamic>> getContinueWatching() async => _list(await _dio.get('/watch-history/continue'));
