@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
@@ -110,10 +111,27 @@ class ApiService {
   }
   Future<void> clearSession() => _storage.deleteAll();
 
+  // No backend /me endpoint; reconstruct the current user from the stored JWT claims so a saved
+  // session auto-restores on launch. Returns null when there's no (valid) token → show login.
   Future<Map<String, dynamic>?> getMe() async {
-    final r = await _dio.get('/profiles/me');
-    final d = _data(r);
-    return d is Map ? Map<String, dynamic>.from(d) : null;
+    final token = await _storage.read(key: 'access_token');
+    if (token == null) return null;
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return null;
+      final payload = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))) as Map<String, dynamic>;
+      const idClaim = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
+      const emailClaim = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress';
+      final id = (payload[idClaim] ?? payload['nameid'] ?? payload['sub'] ?? '').toString();
+      if (id.isEmpty) return null;
+      return {
+        'id': id,
+        'name': (payload['full_name'] ?? payload['name'] ?? '').toString(),
+        'email': (payload[emailClaim] ?? payload['email'] ?? '').toString(),
+      };
+    } catch (_) {
+      return null;
+    }
   }
 
   // ── Branding / Config ──
@@ -142,19 +160,19 @@ class ApiService {
 
   Future<void> deleteProfile(String profileId) => _dio.delete('/profiles/$profileId');
 
+  // Backend route is POST /auth/select-profile {profileId}; it returns a NEW access token with the
+  // profile_id claim, which we MUST persist or every profile-scoped call fails "no active profile".
   Future<Map<String, dynamic>> selectProfile(String profileId) async {
-    final data = _map(await _dio.post('/profiles/$profileId/select'));
-    // The select response carries a NEW access token with the profile_id claim — persist it,
-    // or every profile-scoped call (watchlist, watch-history, rate) would fail "no active profile".
+    final data = _map(await _dio.post('/auth/select-profile', data: {'profileId': profileId}));
     await saveSession(data);
     return data;
   }
 
   Future<void> setProfilePin({required String profileId, required String pin}) =>
-      _dio.put('/profiles/$profileId/pin', data: {'pin': pin});
+      _dio.put('/profiles/$profileId', data: {'pin': pin});
 
   Future<Map<String, dynamic>> verifyProfilePin({required String profileId, required String pin}) async =>
-      _map(await _dio.post('/profiles/$profileId/pin/verify', data: {'pin': pin}));
+      _map(await _dio.post('/profiles/$profileId/verify-pin', data: {'pin': pin}));
 
   // ── Catalog ──
   Future<List<dynamic>> getBanners() async => (_map(await _dio.get('/contents/home'))['banners'] as List?) ?? const [];
