@@ -22,9 +22,10 @@ class MainShell extends StatelessWidget {
     final loc = GoRouterState.of(context).matchedLocation;
     if (loc.startsWith('/home')) return 0;
     if (loc.startsWith('/search')) return 1;
+    if (loc.startsWith('/livetv')) return 3; // must precede '/live' (shared prefix)
     if (loc.startsWith('/live')) return 2;
-    if (loc.startsWith('/downloads')) return 3;
-    if (loc.startsWith('/watchlist')) return 4;
+    if (loc.startsWith('/downloads')) return 4;
+    if (loc.startsWith('/watchlist')) return 5;
     return 0;
   }
 
@@ -33,8 +34,9 @@ class MainShell extends StatelessWidget {
       case 0: context.go('/home'); break;
       case 1: context.go('/search'); break;
       case 2: context.go('/live'); break;
-      case 3: context.go('/downloads'); break;
-      case 4: context.go('/watchlist'); break;
+      case 3: context.go('/livetv'); break;
+      case 4: context.go('/downloads'); break;
+      case 5: context.go('/watchlist'); break;
     }
   }
 
@@ -49,6 +51,7 @@ class MainShell extends StatelessWidget {
           _NavItem(Icons.home_rounded, Icons.home_outlined, 'Home'),
           _NavItem(Icons.search_rounded, Icons.search_outlined, 'Search'),
           _NavItem(Icons.live_tv_rounded, Icons.live_tv_outlined, 'Live'),
+          _NavItem(Icons.tv_rounded, Icons.tv_outlined, 'Live TV'),
           _NavItem(Icons.download_done_rounded, Icons.download_outlined, 'Downloads'),
           _NavItem(Icons.bookmark_rounded, Icons.bookmark_border_rounded, 'My List'),
         ];

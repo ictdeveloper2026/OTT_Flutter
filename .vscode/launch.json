@@ -16,7 +16,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define=API_BASE_URL=http://10.0.2.2:8080"
+        "--dart-define=API_BASE_URL=http://10.0.2.2:50664"
       ]
     },
     {
@@ -26,7 +26,7 @@
       "flutterMode": "profile",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define=API_BASE_URL=http://localhost:8080"
+        "--dart-define=API_BASE_URL=http://localhost:50664"
       ]
     }
   ]

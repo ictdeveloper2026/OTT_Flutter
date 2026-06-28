@@ -11,6 +11,8 @@ import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/home/main_shell.dart';
 import '../../presentation/screens/search/search_screen.dart';
 import '../../presentation/screens/live/live_screen.dart';
+import '../../presentation/screens/live/live_tv_channels_screen.dart';
+import '../../presentation/screens/live/channel_player_screen.dart';
 import '../../presentation/screens/downloads/downloads_screen.dart';
 import '../../presentation/screens/content/content_detail_screen.dart';
 import '../../presentation/screens/player/video_player_screen.dart';
@@ -78,6 +80,7 @@ class AppRouter {
           GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
           GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
           GoRoute(path: '/live', builder: (_, __) => const LiveScreen()),
+          GoRoute(path: '/livetv', builder: (_, __) => const LiveTvChannelsScreen()),
           GoRoute(path: '/downloads', builder: (_, __) => const DownloadsScreen()),
           GoRoute(path: '/watchlist', builder: (_, __) => const PlaceholderScreen('My list')),
         ],
@@ -87,6 +90,10 @@ class AppRouter {
       GoRoute(path: '/content/:id', builder: (_, state) => ContentDetailScreen(contentId: state.pathParameters['id']!)),
       GoRoute(path: '/play/:id', builder: (_, state) => VideoPlayerScreen(contentId: state.pathParameters['id'] ?? '', startPosition: int.tryParse(state.uri.queryParameters['t'] ?? '0') ?? 0)),
       GoRoute(path: '/live/play/:id', builder: (_, __) => const PlaceholderScreen('Live player')),
+      GoRoute(path: '/livetv/play', builder: (_, state) {
+        final extra = (state.extra as Map?) ?? const {};
+        return ChannelPlayerScreen(url: (extra['url'] ?? '').toString(), title: (extra['title'] ?? 'Live TV').toString());
+      }),
       GoRoute(path: '/genre/:slug', builder: (_, __) => const PlaceholderScreen('Genre')),
       GoRoute(path: '/watch-history', builder: (_, __) => const PlaceholderScreen('Watch history')),
       GoRoute(path: '/watch-party/:code', builder: (_, __) => const PlaceholderScreen('Watch party')),
@@ -117,7 +124,7 @@ class AppRouter {
           GoRoute(path: '/admin/content',       builder: (_, __) => const AdminContentScreen()),
           GoRoute(path: '/admin/content/upload',builder: (_, __) => const ContentUploadScreen()),
           GoRoute(path: '/admin/branding',      builder: (_, __) => const BrandingScreen()),
-          GoRoute(path: '/admin/live',          builder: (_, __) => const PlaceholderScreen('Live manager')),
+          GoRoute(path: '/admin/live',          builder: (_, __) => const LiveTvChannelsScreen()),
           GoRoute(path: '/admin/banners',       builder: (_, __) => const PlaceholderScreen('Banners')),
           GoRoute(path: '/admin/users',         builder: (_, __) => const PlaceholderScreen('Users')),
           GoRoute(path: '/admin/analytics',     builder: (_, __) => const PlaceholderScreen('Analytics')),

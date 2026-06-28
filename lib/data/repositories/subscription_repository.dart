@@ -1,4 +1,5 @@
 import '../models/content.dart';
+import '../models/iptv_channel.dart';
 import '../../core/network/api_service.dart';
 
 class SubscriptionRepository {
@@ -90,6 +91,21 @@ class LiveRepository {
     final resp = await _api.getLiveStream(streamId);
     return LiveStream.fromJson(resp);
   }
+
+  // ── Live TV (IPTV channels) ──
+  Future<ChannelPage> getChannels({String? country, String? language, String? category, String? q, int page = 1}) async {
+    final r = await _api.getLiveTvChannels(country: country, language: language, category: category, q: q, page: page);
+    final items = ((r['items'] as List?) ?? const [])
+        .map((e) => IptvChannel.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+    return ChannelPage(
+      items: items,
+      total: (r['totalCount'] as num?)?.toInt() ?? items.length,
+      page: (r['page'] as num?)?.toInt() ?? page,
+    );
+  }
+
+  Future<ChannelFilters> getChannelFilters() async => ChannelFilters.fromJson(await _api.getLiveTvFilters());
 }
 
 class AdminRepository {
@@ -114,6 +130,8 @@ class AdminRepository {
     final resp = await _api.adminGetLiveStreams();
     return resp.map((e) => LiveStream.fromJson(e)).toList();
   }
+
+  Future<String> syncLiveTv() async => _api.adminSyncLiveTv();
 
   Future<List<dynamic>> getAnalytics({String period = '30d'}) async => _api.getAdminAnalytics(period: period);
 

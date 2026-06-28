@@ -134,6 +134,24 @@ class ApiService {
     }
   }
 
+  // Reads the role claim from the stored JWT so the UI can show admin-only actions.
+  // The backend still enforces authorization server-side; this is purely for UX.
+  Future<bool> isAdmin() async {
+    final token = await _storage.read(key: 'access_token');
+    if (token == null) return false;
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return false;
+      final payload = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))) as Map<String, dynamic>;
+      const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+      final role = payload[roleClaim] ?? payload['role'];
+      if (role is List) return role.map((e) => e.toString().toLowerCase()).contains('admin');
+      return role?.toString().toLowerCase() == 'admin';
+    } catch (_) {
+      return false;
+    }
+  }
+
   // ── Branding / Config ──
   Future<Response> getPublicConfig() => _dio.get('/config/public');
 
@@ -228,6 +246,27 @@ class ApiService {
   // ── Live ──
   Future<List<dynamic>> getLiveStreams() async => (_map(await _dio.get('/live'))['items'] as List?) ?? const [];
   Future<Map<String, dynamic>> getLiveStream(String streamId) async => _map(await _dio.get('/live/$streamId'));
+
+  // ── Live TV (IPTV channels, backend LiveTvController) ──
+  Future<Map<String, dynamic>> getLiveTvChannels({
+    String? country, String? language, String? category, String? q, int page = 1, int pageSize = 40,
+  }) async =>
+      _map(await _dio.get('/livetv/channels', queryParameters: {
+        if (country != null && country.isNotEmpty) 'country': country,
+        if (language != null && language.isNotEmpty) 'language': language,
+        if (category != null && category.isNotEmpty) 'category': category,
+        if (q != null && q.isNotEmpty) 'q': q,
+        'page': page, 'pageSize': pageSize,
+      }));
+
+  Future<Map<String, dynamic>> getLiveTvFilters() async => _map(await _dio.get('/livetv/filters'));
+
+  // Admin-only: kicks off the iptv-org sync (backend enqueues a Hangfire job).
+  Future<String> adminSyncLiveTv() async {
+    final r = await _dio.post('/admin/livetv/sync');
+    final body = r.data;
+    return (body is Map && body['message'] != null) ? body['message'].toString() : 'Channel sync started.';
+  }
 
   // ── Subscriptions / billing ──
   Future<List<dynamic>> getSubscriptionPlans() async => _list(await _dio.get('/plans'));

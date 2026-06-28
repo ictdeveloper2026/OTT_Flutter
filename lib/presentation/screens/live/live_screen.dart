@@ -29,8 +29,42 @@ class _LiveScreenState extends State<LiveScreen> {
             pinned: true,
             title: const Text('Live', style: TextStyle(fontWeight: FontWeight.bold)),
             actions: [
+              IconButton(tooltip: 'Live TV channels', icon: const Icon(Icons.tv_outlined), onPressed: () => context.go('/livetv')),
               IconButton(icon: const Icon(Icons.refresh), onPressed: () => context.read<LiveBloc>().add(LiveStreamRefreshed())),
             ],
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => context.go('/livetv'),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(colors: [theme.colorScheme.primary.withOpacity(0.9), theme.colorScheme.secondary.withOpacity(0.7)]),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.tv_rounded, color: Colors.white, size: 32),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('Browse Live TV Channels', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                            SizedBox(height: 2),
+                            Text('Thousands of free channels — by country & language', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
           BlocBuilder<LiveBloc, LiveState>(
             builder: (context, state) {
@@ -108,7 +142,7 @@ class _LiveCard extends StatelessWidget {
                       ]),
                     ),
                   ),
-                if (stream.viewerCount != null)
+                if (stream.viewerCount > 0)
                   Positioned(
                     top: 12,
                     right: 12,
@@ -118,7 +152,7 @@ class _LiveCard extends StatelessWidget {
                       child: Row(children: [
                         const Icon(Icons.remove_red_eye, color: Colors.white, size: 14),
                         const SizedBox(width: 4),
-                        Text(_formatViewers(stream.viewerCount!), style: const TextStyle(color: Colors.white, fontSize: 12)),
+                        Text(_formatViewers(stream.viewerCount), style: const TextStyle(color: Colors.white, fontSize: 12)),
                       ]),
                     ),
                   ),

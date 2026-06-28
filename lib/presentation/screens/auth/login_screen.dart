@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../presentation/blocs/auth/auth_bloc.dart';
 import '../../../core/theme/app_theme.dart';
@@ -150,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Social login
                       OutlinedButton.icon(
                         onPressed: _googleSignIn,
-                        icon: Image.network('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg', width: 20, height: 20),
+                        icon: SvgPicture.network('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg', width: 20, height: 20),
                         label: const Text('Continue with Google'),
                         style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
                       ),
