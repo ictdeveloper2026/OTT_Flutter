@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import 'package:hive/hive.dart';
 import '../../../core/network/api_service.dart';
 import '../../../data/models/content.dart';
@@ -46,7 +47,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       await _settingsBox.put(AppConstants.brandingKey, jsonEncode(event.branding.toJson()));
       emit(ThemeLoaded(branding: event.branding, themeData: _buildTheme(event.branding)));
     } catch (e) {
-      emit(ThemeError(message: e.toString()));
+      emit(ThemeError(message: friendlyError(e)));
     }
   }
 

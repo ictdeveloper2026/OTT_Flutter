@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/content_repository.dart';
 import '../../../data/models/content.dart';
 import '../../../core/constants/app_constants.dart';
@@ -36,7 +37,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       final result = await _repository.search(event.query, genre: event.genre, type: event.type);
       emit(SearchLoaded(query: event.query, results: result.data, hasMore: result.hasNextPage));
     } catch (e) {
-      emit(SearchError(message: e.toString()));
+      emit(SearchError(message: friendlyError(e)));
     }
   }
 

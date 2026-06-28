@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/content_repository.dart';
 import '../../../data/models/content.dart';
 
@@ -27,7 +28,7 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
       final featured = await _repository.getFeatured();
       emit(ContentHomeLoaded2(banners: banners, rows: rows, featured: featured));
     } catch (e) {
-      emit(ContentError(message: e.toString()));
+      emit(ContentError(message: friendlyError(e)));
     }
   }
 
@@ -38,7 +39,7 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
       final related = await _repository.getRelated(event.contentId);
       emit(ContentDetailLoaded2(content: content, related: related));
     } catch (e) {
-      emit(ContentError(message: e.toString()));
+      emit(ContentError(message: friendlyError(e)));
     }
   }
 
@@ -63,7 +64,7 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
         ));
       }
     } catch (e) {
-      emit(ContentError(message: e.toString()));
+      emit(ContentError(message: friendlyError(e)));
     }
   }
 

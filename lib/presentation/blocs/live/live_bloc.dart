@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/live_repository.dart';
 import '../../../data/models/content.dart';
 
@@ -20,7 +21,7 @@ class LiveBloc extends Bloc<LiveEvent, LiveState> {
       final streams = await _repository.getLiveStreams();
       emit(LiveStreamsReady(streams: streams));
     } catch (e) {
-      emit(LiveError(message: e.toString()));
+      emit(LiveError(message: friendlyError(e)));
     }
   }
 
@@ -30,7 +31,7 @@ class LiveBloc extends Bloc<LiveEvent, LiveState> {
       final stream = await _repository.getLiveStream(event.streamId);
       emit(LiveStreamActive(stream: stream));
     } catch (e) {
-      emit(LiveError(message: e.toString()));
+      emit(LiveError(message: friendlyError(e)));
     }
   }
 

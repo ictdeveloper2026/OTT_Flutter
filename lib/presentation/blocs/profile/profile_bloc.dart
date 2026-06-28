@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/profile_repository.dart';
 import '../../../data/models/content.dart';
 
@@ -24,7 +25,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final profiles = await _repository.getProfiles();
       emit(ProfileListLoaded(profiles: profiles));
     } catch (e) {
-      emit(ProfileError(message: e.toString()));
+      emit(ProfileError(message: friendlyError(e)));
     }
   }
 
@@ -33,7 +34,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       await _repository.selectProfile(event.profileId);
       emit(ProfileActive(profileId: event.profileId));
     } catch (e) {
-      emit(ProfileError(message: e.toString()));
+      emit(ProfileError(message: friendlyError(e)));
     }
   }
 
@@ -44,7 +45,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final profiles = await _repository.getProfiles();
       emit(ProfileListLoaded(profiles: profiles));
     } catch (e) {
-      emit(ProfileError(message: e.toString()));
+      emit(ProfileError(message: friendlyError(e)));
     }
   }
 
@@ -55,7 +56,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final profiles = await _repository.getProfiles();
       emit(ProfileListLoaded(profiles: profiles));
     } catch (e) {
-      emit(ProfileError(message: e.toString()));
+      emit(ProfileError(message: friendlyError(e)));
     }
   }
 
@@ -66,7 +67,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final profiles = await _repository.getProfiles();
       emit(ProfileListLoaded(profiles: profiles));
     } catch (e) {
-      emit(ProfileError(message: e.toString()));
+      emit(ProfileError(message: friendlyError(e)));
     }
   }
 
@@ -85,7 +86,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(ProfileError(message: 'Invalid PIN'));
       }
     } catch (e) {
-      emit(ProfileError(message: e.toString()));
+      emit(ProfileError(message: friendlyError(e)));
     }
   }
 }

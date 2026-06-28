@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/subscription_repository.dart';
 import '../../../data/models/content.dart';
 
@@ -25,7 +26,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       final current = await _repository.getCurrentSubscription();
       emit(SubscriptionPlansReady(plans: plans, current: current));
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 
@@ -38,7 +39,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       );
       emit(SubscriptionPaymentReady(order: order, planId: event.planId));
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 
@@ -52,7 +53,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       );
       emit(SubscriptionActivated(subscription: subscription));
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 
@@ -66,7 +67,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       );
       emit(SubscriptionActivated(subscription: subscription));
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 
@@ -75,7 +76,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       await _repository.cancelSubscription();
       emit(SubscriptionCancelledState());
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 
@@ -85,7 +86,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       final current = await _repository.getCurrentSubscription();
       emit(SubscriptionCurrentReady(subscription: current));
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 
@@ -94,7 +95,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       final result = await _repository.validatePromo(event.code, event.planId);
       emit(SubscriptionPromoValid(discount: result['discount'], finalAmount: result['finalAmount']));
     } catch (e) {
-      emit(SubscriptionError(message: e.toString()));
+      emit(SubscriptionError(message: friendlyError(e)));
     }
   }
 }

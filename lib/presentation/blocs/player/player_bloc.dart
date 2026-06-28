@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/content_repository.dart';
 import '../../../data/models/content.dart';
 import '../../../data/models/stream_info.dart';
@@ -39,7 +40,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         episodeId: event.episodeId,
       ));
     } catch (e) {
-      emit(PlayerError(message: e.toString()));
+      emit(PlayerError(message: friendlyError(e)));
     }
   }
 
@@ -89,7 +90,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       final content = await _repository.getContent(event.contentId);
       emit(PlayerReady(content: content, streamInfo: streamInfo, episodeId: event.episodeId));
     } catch (e) {
-      emit(PlayerError(message: e.toString()));
+      emit(PlayerError(message: friendlyError(e)));
     }
   }
 

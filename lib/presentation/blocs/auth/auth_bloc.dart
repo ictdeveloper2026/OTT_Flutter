@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/auth_repository.dart';
 import '../../../data/models/content.dart';
 
@@ -45,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user: result.user!));
       }
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(message: friendlyError(e)));
     }
   }
 
@@ -64,7 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user: result.user!));
       }
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(message: friendlyError(e)));
     }
   }
 
@@ -77,7 +78,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(message: friendlyError(e)));
     }
   }
 
@@ -87,7 +88,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _authRepository.verifyOtp(email: event.email, otp: event.otp);
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(message: friendlyError(e)));
     }
   }
 
@@ -97,7 +98,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.forgotPassword(email: event.email);
       emit(AuthPasswordResetSent(email: event.email));
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(message: friendlyError(e)));
     }
   }
 
@@ -107,7 +108,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.resetPassword(token: event.token, password: event.password);
       emit(AuthPasswordResetSuccess());
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(message: friendlyError(e)));
     }
   }
 

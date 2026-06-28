@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../core/error/failure.dart';
 import '../../../data/repositories/admin_repository.dart';
 import '../../../data/models/content.dart';
 
@@ -26,7 +27,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       final stats = await _repository.getDashboardStats();
       emit(AdminDashboardReady(stats: stats));
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -36,7 +37,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       final result = await _repository.getContents(page: event.page, search: event.search);
       emit(AdminContentListReady(contents: result.data, hasMore: result.hasNextPage, page: event.page));
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -46,7 +47,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       final result = await _repository.getUsers(page: event.page, search: event.search);
       emit(AdminUsersReady(users: result.data, hasMore: result.hasNextPage));
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -56,7 +57,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       final streams = await _repository.getLiveStreams();
       emit(AdminLiveStreamsReady(streams: streams));
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -66,7 +67,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       final analytics = await _repository.getAnalytics(period: event.period);
       emit(AdminAnalyticsReady(data: analytics));
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -76,7 +77,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       final plans = await _repository.getSubscriptionPlans();
       emit(AdminPlansReady(plans: plans));
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -85,7 +86,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       await _repository.deleteContent(event.contentId);
       add(AdminContentListLoaded());
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -94,7 +95,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       await _repository.toggleContent(event.contentId, event.isActive);
       add(AdminContentListLoaded());
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 
@@ -103,7 +104,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       await _repository.changeUserStatus(event.userId, event.status);
       add(AdminUsersLoaded());
     } catch (e) {
-      emit(AdminError(message: e.toString()));
+      emit(AdminError(message: friendlyError(e)));
     }
   }
 }
