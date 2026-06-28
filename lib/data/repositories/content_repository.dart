@@ -1,25 +1,35 @@
+import 'dart:convert';
+import 'package:hive/hive.dart';
 import '../models/content.dart';
 import '../models/stream_info.dart';
 import '../../core/network/api_service.dart';
 
 class ContentRepository {
   final ApiService _api;
-  ContentRepository(this._api);
+  final Box? _cache; // optional Hive cache for offline-resilient catalog reads
+  ContentRepository(this._api, [this._cache]);
 
-  Future<List<Banner>> getBanners() async {
-    final resp = await _api.getBanners();
-    return resp.map((e) => Banner.fromJson(e)).toList();
+  // Cache-aside: fetch from the API and cache the raw JSON; on failure (offline) fall back to the
+  // last cached copy so the home catalog still renders instantly / offline.
+  Future<List<T>> _cachedList<T>(String key, Future<List<dynamic>> Function() fetch, T Function(Map<String, dynamic>) parse) async {
+    try {
+      final raw = await fetch();
+      await _cache?.put(key, jsonEncode(raw));
+      return raw.map((e) => parse(Map<String, dynamic>.from(e))).toList();
+    } catch (e) {
+      final cached = _cache?.get(key);
+      if (cached is String) {
+        return (jsonDecode(cached) as List).map((e) => parse(Map<String, dynamic>.from(e))).toList();
+      }
+      rethrow;
+    }
   }
 
-  Future<List<ContentRow>> getContentRows() async {
-    final resp = await _api.getContentRows();
-    return resp.map((e) => ContentRow.fromJson(e)).toList();
-  }
+  Future<List<Banner>> getBanners() => _cachedList('home_banners', _api.getBanners, Banner.fromJson);
 
-  Future<List<Content>> getFeatured() async {
-    final resp = await _api.getFeatured();
-    return resp.map((e) => Content.fromJson(e)).toList();
-  }
+  Future<List<ContentRow>> getContentRows() => _cachedList('home_rows', _api.getContentRows, ContentRow.fromJson);
+
+  Future<List<Content>> getFeatured() => _cachedList('featured', _api.getFeatured, Content.fromJson);
 
   Future<PagedResult<Content>> search(String query, {String? genre, String? type, int page = 1}) async {
     final resp = await _api.search(query: query, genre: genre, type: type, page: page);

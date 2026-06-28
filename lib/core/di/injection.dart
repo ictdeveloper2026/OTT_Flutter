@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
 import 'package:get_it/get_it.dart';
@@ -43,7 +42,7 @@ Future<void> configureDependencies() async {
 
   // Repositories
   sl.registerLazySingleton<AuthRepository>(() => AuthRepository(sl<ApiService>()));
-  sl.registerLazySingleton<ContentRepository>(() => ContentRepository(sl<ApiService>()));
+  sl.registerLazySingleton<ContentRepository>(() => ContentRepository(sl<ApiService>(), sl<Box>(instanceName: 'cache')));
   sl.registerLazySingleton<SubscriptionRepository>(() => SubscriptionRepository(sl<ApiService>()));
   sl.registerLazySingleton<ProfileRepository>(() => ProfileRepository(sl<ApiService>()));
   sl.registerLazySingleton<LiveRepository>(() => LiveRepository(sl<ApiService>()));
