@@ -220,18 +220,24 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> initiateSubscription({required String planId, String? promoCode}) async =>
-      _map(await _dio.post('/subscriptions/order', data: {'planId': planId, 'promoCode': promoCode}));
+      _map(await _dio.post('/subscriptions/initiate', data: {'planId': planId, 'promoCode': promoCode}));
 
   Future<Map<String, dynamic>> confirmSubscription({required String orderId, required String paymentId, String? signature}) async =>
-      _map(await _dio.post('/subscriptions/verify', data: {'orderId': orderId, 'paymentId': paymentId, 'signature': signature}));
+      _map(await _dio.post('/subscriptions/confirm', data: {'orderId': orderId, 'paymentId': paymentId, 'signature': signature}));
 
-  Future<void> cancelSubscription() => _dio.post('/subscriptions/cancel');
+  Future<void> cancelSubscription() => _dio.post('/subscriptions/cancel', data: {'reason': 'user_requested'});
 
   Future<Map<String, dynamic>> validatePromo({required String code, required String planId}) async =>
       _map(await _dio.post('/promo/validate', data: {'code': code, 'planId': planId}));
 
+  // Backend splits IAP by store: /subscriptions/iap/google ({productId, purchaseToken}) and
+  // /subscriptions/iap/apple ({receiptData}).
   Future<Map<String, dynamic>> verifyIap({required String productId, required String purchaseToken, required String platform}) async =>
-      _map(await _dio.post('/subscriptions/iap/verify', data: {'productId': productId, 'purchaseToken': purchaseToken, 'platform': platform}));
+      platform.toLowerCase() == 'apple' || platform.toLowerCase() == 'ios'
+          ? _map(await _dio.post('/subscriptions/iap/apple', data: {'receiptData': purchaseToken}))
+          : _map(await _dio.post('/subscriptions/iap/google', data: {'productId': productId, 'purchaseToken': purchaseToken}));
+
+  Future<List<dynamic>> getInvoices() async => _list(await _dio.get('/invoices'));
 
   // ── Admin ──
   Future<Map<String, dynamic>> getAdminStats() async => _map(await _dio.get('/admin/stats'));
