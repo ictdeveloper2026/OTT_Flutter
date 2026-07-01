@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/network/api_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/subscription/subscription_bloc.dart';
 
@@ -12,10 +14,34 @@ class BillingScreen extends StatefulWidget {
 }
 
 class _BillingScreenState extends State<BillingScreen> {
+  List<Map<String, dynamic>> _payments = [];
+  bool _loadingPayments = true;
+
   @override
   void initState() {
     super.initState();
     context.read<SubscriptionBloc>().add(SubscriptionCurrentLoaded());
+    _loadPayments();
+  }
+
+  Future<void> _loadPayments() async {
+    try {
+      final raw = await sl<ApiService>().getInvoices();
+      if (!mounted) return;
+      setState(() {
+        _payments = raw.map((e) => Map<String, dynamic>.from(e)).toList();
+        _loadingPayments = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loadingPayments = false);
+    }
+  }
+
+  String _fmtDate(String? iso) {
+    final d = DateTime.tryParse(iso ?? '');
+    if (d == null) return '';
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }
 
   @override
@@ -145,24 +171,30 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   Widget _buildPaymentList(OttColors colors, SubscriptionState state) {
-    final payments = _mockPayments;
-
-    if (payments.isEmpty) {
-      return SliverFillRemaining(
-        child: Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.receipt_long_outlined, size: 64, color: colors.textSecondary),
-            const SizedBox(height: 12),
-            Text('No payment history', style: TextStyle(color: colors.textSecondary)),
-          ]),
+    if (_loadingPayments) {
+      return SliverToBoxAdapter(
+        child: Padding(padding: const EdgeInsets.all(32), child: Center(child: CircularProgressIndicator(color: colors.primary))),
+      );
+    }
+    if (_payments.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Center(
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.receipt_long_outlined, size: 64, color: colors.textSecondary),
+              const SizedBox(height: 12),
+              Text('No payment history', style: TextStyle(color: colors.textSecondary)),
+            ]),
+          ),
         ),
       );
     }
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, i) => _buildPaymentTile(payments[i], colors),
-        childCount: payments.length,
+        (context, i) => _buildPaymentTile(_payments[i], colors),
+        childCount: _payments.length,
       ),
     );
   }
@@ -191,12 +223,12 @@ class _BillingScreenState extends State<BillingScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(payment['description'] ?? 'Subscription', style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.w500, fontSize: 14)),
-              Text('${payment['gateway']} · ${payment['date']}', style: TextStyle(color: colors.textSecondary, fontSize: 12)),
+              Text((payment['description'] ?? 'Subscription').toString(), style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.w500, fontSize: 14)),
+              Text('${payment['gateway'] ?? ''} · ${_fmtDate(payment['createdAt']?.toString())}', style: TextStyle(color: colors.textSecondary, fontSize: 12)),
             ]),
           ),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text('₹${payment['amount']}',
+            Text('${payment['currency'] ?? '₹'} ${payment['amount'] ?? 0}',
                 style: TextStyle(color: isSuccess ? Colors.green : Colors.red, fontWeight: FontWeight.bold)),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -238,11 +270,4 @@ class _BillingScreenState extends State<BillingScreen> {
     );
   }
 
-  final List<Map<String, dynamic>> _mockPayments = [
-    {'amount': 499, 'status': 'success', 'description': 'Premium Plan - Monthly', 'gateway': 'Razorpay', 'date': 'Jun 12, 2026'},
-    {'amount': 499, 'status': 'success', 'description': 'Premium Plan - Monthly', 'gateway': 'Razorpay', 'date': 'May 12, 2026'},
-    {'amount': 499, 'status': 'success', 'description': 'Premium Plan - Monthly', 'gateway': 'Razorpay', 'date': 'Apr 12, 2026'},
-    {'amount': 499, 'status': 'failed', 'description': 'Premium Plan - Monthly', 'gateway': 'Razorpay', 'date': 'Mar 12, 2026'},
-    {'amount': 249, 'status': 'success', 'description': 'Standard Plan - Monthly', 'gateway': 'Razorpay', 'date': 'Feb 12, 2026'},
-  ];
 }

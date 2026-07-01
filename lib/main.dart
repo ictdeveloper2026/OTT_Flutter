@@ -5,6 +5,7 @@ import 'package:media_kit/media_kit.dart';
 
 import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 import 'presentation/blocs/auth/auth_bloc.dart';
 import 'presentation/blocs/theme/theme_bloc.dart';
 import 'presentation/blocs/content/content_bloc.dart';
@@ -13,6 +14,7 @@ import 'presentation/blocs/subscription/subscription_bloc.dart';
 import 'presentation/blocs/search/search_bloc.dart';
 import 'presentation/blocs/live/live_bloc.dart';
 import 'presentation/blocs/admin/admin_bloc.dart';
+import 'presentation/blocs/community/community_bloc.dart';
 import 'presentation/blocs/player/player_bloc.dart';
 
 Future<void> main() async {
@@ -40,11 +42,16 @@ class StreamFlixApp extends StatelessWidget {
         BlocProvider(create: (_) => sl<SearchBloc>()),
         BlocProvider(create: (_) => sl<LiveBloc>()),
         BlocProvider(create: (_) => sl<AdminBloc>()),
+        BlocProvider(create: (_) => sl<CommunityBloc>()..add(CommunityLoadRequested())),
         BlocProvider(create: (_) => sl<PlayerBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, themeState) {
-          final theme = themeState is ThemeLoaded ? themeState.themeData : ThemeData.dark();
+          // Fallback must carry the OttColors extension; ThemeData.dark() does
+          // not, which crashes screens that read theme.extension<OttColors>()!.
+          final theme = themeState is ThemeLoaded
+              ? themeState.themeData
+              : AppTheme.buildDarkTheme(null);
           return MaterialApp.router(
             title: 'StreamFlix',
             debugShowCheckedModeBanner: false,

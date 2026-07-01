@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../data/models/content.dart';
 
 /// Bottom-sheet list of subtitle tracks (plus "Off") for the player.
+///
+/// Driven by the stream response (`streamInfo.subtitles`) so each entry carries
+/// the real track URL/language the player needs to actually load it.
 class SubtitleSelector extends StatelessWidget {
-  final List<Subtitle> subtitles;
-  final String? selectedId;
-  final ValueChanged<String?> onSelect;
+  /// Each map: { 'language', 'label', 'url', 'format' }.
+  final List<Map<String, dynamic>> subtitles;
+
+  /// URL of the currently-applied subtitle, or null when off.
+  final String? selectedUrl;
+
+  /// Called with the chosen subtitle map, or null for "Off".
+  final ValueChanged<Map<String, dynamic>?> onSelect;
 
   const SubtitleSelector({
     super.key,
     required this.subtitles,
     required this.onSelect,
-    this.selectedId,
+    this.selectedUrl,
   });
 
   @override
@@ -34,15 +41,17 @@ class SubtitleSelector extends StatelessWidget {
             ),
             ListTile(
               title: Text('Off', style: TextStyle(color: colors.textPrimary)),
-              trailing: selectedId == null ? Icon(Icons.check, color: colors.primary) : null,
+              trailing: selectedUrl == null ? Icon(Icons.check, color: colors.primary) : null,
               onTap: () => onSelect(null),
             ),
             ...subtitles.map((s) {
-              final selected = s.id == selectedId;
+              final url = s['url'] as String?;
+              final label = (s['label'] ?? s['language'] ?? 'Unknown').toString();
+              final selected = url != null && url == selectedUrl;
               return ListTile(
-                title: Text(s.label, style: TextStyle(color: colors.textPrimary)),
+                title: Text(label, style: TextStyle(color: colors.textPrimary)),
                 trailing: selected ? Icon(Icons.check, color: colors.primary) : null,
-                onTap: () => onSelect(s.id),
+                onTap: () => onSelect(s),
               );
             }),
           ],

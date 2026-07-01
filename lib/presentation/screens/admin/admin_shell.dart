@@ -39,6 +39,7 @@ class _AdminSideNav extends StatelessWidget {
     _NavItem(icon: Icons.local_offer_outlined, label: 'Promos', route: '/admin/promos'),
     _NavItem(icon: Icons.analytics_outlined, label: 'Analytics', route: '/admin/analytics'),
     _NavItem(icon: Icons.currency_rupee, label: 'Revenue', route: '/admin/revenue'),
+    _NavItem(icon: Icons.forum_outlined, label: 'Community', route: '/admin/community'),
     _NavItem(icon: Icons.palette_outlined, label: 'Branding', route: '/admin/branding'),
     _NavItem(icon: Icons.settings_outlined, label: 'Config', route: '/admin/config'),
   ];

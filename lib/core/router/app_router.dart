@@ -27,6 +27,12 @@ import '../../presentation/screens/admin/admin_shell.dart';
 import '../../presentation/screens/admin/admin_dashboard_screen.dart';
 import '../../presentation/screens/admin/admin_content_screen.dart';
 import '../../presentation/screens/admin/content_upload_screen.dart';
+import '../../presentation/screens/admin/content_tracks_screen.dart';
+import '../../presentation/screens/admin/community_admin_screen.dart';
+import '../../presentation/screens/admin/admin_config_screens.dart';
+import '../../presentation/screens/admin/admin_extra_screens.dart';
+import '../../presentation/screens/admin/admin_promos_rows_screens.dart';
+import '../../presentation/screens/community/community_screen.dart';
 import '../../presentation/screens/admin/branding_screen.dart';
 
 /// Simple placeholder for screens that are not built yet.
@@ -82,6 +88,7 @@ class AppRouter {
           GoRoute(path: '/live', builder: (_, __) => const LiveScreen()),
           GoRoute(path: '/livetv', builder: (_, __) => const LiveTvChannelsScreen()),
           GoRoute(path: '/downloads', builder: (_, __) => const DownloadsScreen()),
+          GoRoute(path: '/community', builder: (_, __) => const CommunityScreen()),
           GoRoute(path: '/watchlist', builder: (_, __) => const PlaceholderScreen('My list')),
         ],
       ),
@@ -121,17 +128,40 @@ class AppRouter {
         builder: (_, __, child) => AdminShell(child: child),
         routes: [
           GoRoute(path: '/admin',               builder: (_, __) => const AdminDashboardScreen()),
+          GoRoute(path: '/admin/dashboard',     builder: (_, __) => const AdminDashboardScreen()),
           GoRoute(path: '/admin/content',       builder: (_, __) => const AdminContentScreen()),
-          GoRoute(path: '/admin/content/upload',builder: (_, __) => const ContentUploadScreen()),
+          GoRoute(
+            path: '/admin/content/upload',
+            builder: (_, state) {
+              // "Edit" passes the existing title's id via extra so the form prefills
+              // and updates (instead of creating a duplicate).
+              final extra = state.extra is Map ? state.extra as Map : const {};
+              return ContentUploadScreen(contentId: extra['contentId'] as String?);
+            },
+          ),
+          GoRoute(
+            path: '/admin/content/tracks',
+            builder: (_, state) {
+              final extra = state.extra is Map ? state.extra as Map : const {};
+              return ContentTracksScreen(
+                contentId: (extra['contentId'] ?? '').toString(),
+                title: extra['title'] as String?,
+              );
+            },
+          ),
           GoRoute(path: '/admin/branding',      builder: (_, __) => const BrandingScreen()),
+          GoRoute(path: '/admin/community',     builder: (_, __) => const CommunityAdminScreen()),
           GoRoute(path: '/admin/live',          builder: (_, __) => const LiveTvChannelsScreen()),
-          GoRoute(path: '/admin/banners',       builder: (_, __) => const PlaceholderScreen('Banners')),
-          GoRoute(path: '/admin/users',         builder: (_, __) => const PlaceholderScreen('Users')),
-          GoRoute(path: '/admin/analytics',     builder: (_, __) => const PlaceholderScreen('Analytics')),
-          GoRoute(path: '/admin/subscriptions', builder: (_, __) => const PlaceholderScreen('Subscriptions')),
-          GoRoute(path: '/admin/revenue',       builder: (_, __) => const PlaceholderScreen('Revenue')),
+          GoRoute(path: '/admin/banners',       builder: (_, __) => const AdminBannersScreen()),
+          GoRoute(path: '/admin/rows',          builder: (_, __) => const AdminRowsScreen()),
+          GoRoute(path: '/admin/users',         builder: (_, __) => const AdminUsersScreen()),
+          GoRoute(path: '/admin/plans',         builder: (_, __) => const AdminPlansScreen()),
+          GoRoute(path: '/admin/promos',        builder: (_, __) => const AdminPromosScreen()),
+          GoRoute(path: '/admin/analytics',     builder: (_, __) => const AdminAnalyticsScreen()),
+          GoRoute(path: '/admin/subscriptions', builder: (_, __) => const AdminPlansScreen()),
+          GoRoute(path: '/admin/revenue',       builder: (_, __) => const AdminRevenueScreen()),
           GoRoute(path: '/admin/navigation',    builder: (_, __) => const PlaceholderScreen('Navigation')),
-          GoRoute(path: '/admin/config',        builder: (_, __) => const PlaceholderScreen('Config')),
+          GoRoute(path: '/admin/config',        builder: (_, __) => const AdminConfigScreen()),
           GoRoute(path: '/admin/creators',      builder: (_, __) => const PlaceholderScreen('Creators')),
         ],
       ),

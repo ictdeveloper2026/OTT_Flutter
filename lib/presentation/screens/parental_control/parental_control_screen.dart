@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/network/api_service.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../blocs/profile/profile_bloc.dart';
 import '../../widgets/shared_widgets.dart';
 
 class ParentalControlScreen extends StatefulWidget {
@@ -13,10 +13,41 @@ class ParentalControlScreen extends StatefulWidget {
 }
 
 class _ParentalControlScreenState extends State<ParentalControlScreen> {
+  final _api = sl<ApiService>();
   String _selectedMaturity = 'all';
   bool _requirePin = false;
   bool _isPinSet = false;
   bool _isLoading = false;
+  bool _initialLoading = true;
+  bool _blockViolence = false;
+  bool _blockLanguage = false;
+  bool _blockSexualContent = false;
+  String? _newPin; // captured when the admin sets/changes the PIN this session
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final pc = await _api.getParentalControl();
+      if (!mounted) return;
+      setState(() {
+        final m = (pc['maturityLevel'] ?? 'all').toString();
+        _selectedMaturity = _levels.containsKey(m) ? m : 'all';
+        _requirePin = pc['requirePin'] == true;
+        _isPinSet = pc['isPinSet'] == true;
+        _blockViolence = pc['blockViolence'] == true;
+        _blockLanguage = pc['blockLanguage'] == true;
+        _blockSexualContent = pc['blockSexualContent'] == true;
+        _initialLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _initialLoading = false);
+    }
+  }
 
   final Map<String, _MaturityLevel> _levels = {
     'kids': _MaturityLevel('Kids', 'Ages 0-12. G and PG rated content only.', Icons.child_care, Colors.green),
@@ -35,7 +66,9 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
         leading: IconButton(icon: Icon(Icons.arrow_back, color: colors.textPrimary), onPressed: () => context.pop()),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
+      body: _initialLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,8 +214,8 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
                   style: TextStyle(color: colors.textPrimary)),
               trailing: Icon(Icons.chevron_right, color: colors.textSecondary),
               onTap: () async {
-                final entered = await showPinDialog(context);
-                if (entered) setState(() => _isPinSet = true);
+                final pin = await _promptPin();
+                if (pin != null) setState(() { _newPin = pin; _isPinSet = true; });
               },
             ),
           ],
@@ -200,33 +233,75 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
         children: [
           Text('Additional Restrictions', style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          ...['Block Violence', 'Block Strong Language', 'Block Sexual Content'].map((label) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                Icon(Icons.block, color: colors.textSecondary, size: 18),
-                const SizedBox(width: 10),
-                Expanded(child: Text(label, style: TextStyle(color: colors.textPrimary, fontSize: 14))),
-                Switch(value: false, onChanged: (_) {}, activeThumbColor: colors.primary),
-              ],
-            ),
-          )),
+          _restrictionRow(colors, 'Block Violence', _blockViolence, (v) => setState(() => _blockViolence = v)),
+          _restrictionRow(colors, 'Block Strong Language', _blockLanguage, (v) => setState(() => _blockLanguage = v)),
+          _restrictionRow(colors, 'Block Sexual Content', _blockSexualContent, (v) => setState(() => _blockSexualContent = v)),
         ],
       ),
     );
   }
 
-  void _saveSettings() {
+  Widget _restrictionRow(OttColors colors, String label, bool value, ValueChanged<bool> onChanged) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(children: [
+          Icon(Icons.block, color: colors.textSecondary, size: 18),
+          const SizedBox(width: 10),
+          Expanded(child: Text(label, style: TextStyle(color: colors.textPrimary, fontSize: 14))),
+          Switch(value: value, onChanged: onChanged, activeThumbColor: colors.primary),
+        ]),
+      );
+
+  Future<String?> _promptPin() async {
+    final ctrl = TextEditingController();
+    final colors = Theme.of(context).extension<OttColors>()!;
+    return showDialog<String>(
+      context: context,
+      builder: (dctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        title: const Text('Set a 4-digit PIN'),
+        content: TextField(
+          controller: ctrl,
+          keyboardType: TextInputType.number,
+          obscureText: true,
+          maxLength: 4,
+          decoration: const InputDecoration(counterText: '', hintText: '••••'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (ctrl.text.trim().length == 4) Navigator.pop(dctx, ctrl.text.trim());
+            },
+            child: const Text('Set'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveSettings() async {
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(seconds: 1), () {
+    try {
+      await _api.saveParentalControl({
+        'maturityLevel': _selectedMaturity,
+        'requirePin': _requirePin,
+        'blockViolence': _blockViolence,
+        'blockLanguage': _blockLanguage,
+        'blockSexualContent': _blockSexualContent,
+        if (_requirePin && _newPin != null) 'pin': _newPin,
+      });
       if (mounted) {
-        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Parental controls saved!'), backgroundColor: Colors.green),
         );
         context.pop();
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 }
 

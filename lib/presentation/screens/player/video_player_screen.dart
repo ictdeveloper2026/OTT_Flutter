@@ -11,11 +11,11 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../blocs/player/player_bloc.dart';
-import '../../../data/models/content.dart';
 import '../../widgets/player/player_controls.dart';
 import '../../widgets/episode_drawer.dart';
 import '../../widgets/player/subtitle_selector.dart';
 import '../../widgets/player/quality_selector.dart';
+import '../../widgets/player/audio_selector.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String contentId;
@@ -37,6 +37,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Timer? _hideTimer;
   Timer? _progressTimer;
   String _playerType = 'HLS'; // HLS | YouTube | Vimeo
+
+  // Stream URL the media_kit player was last opened with. Guards the BlocConsumer
+  // listener so it only (re)builds the player when the stream actually changes —
+  // not on every PlayerReady copyWith (play/pause/seek/subtitle/quality/etc.).
+  String? _currentStreamUrl;
+  // Persist track selections so they survive a quality re-open.
+  Map<String, dynamic>? _selectedSubtitle;
+  String _selectedQuality = 'Auto';
 
   @override
   void initState() {
@@ -62,6 +70,43 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     _player!.open(Media(url, start: Duration(seconds: widget.startPosition)));
     _player!.stream.position.listen((pos) => _syncProgress(pos.inSeconds));
     _startProgressSync();
+  }
+
+  void _disposePlayers() {
+    _progressTimer?.cancel();
+    _player?.dispose();
+    _player = null;
+    _controller = null;
+    _ytController?.dispose();
+    _ytController = null;
+    _vimeoController = null;
+  }
+
+  /// Apply a subtitle track (or turn captions off when [sub] is null).
+  void _applySubtitle(Map<String, dynamic>? sub) {
+    _selectedSubtitle = sub;
+    final p = _player;
+    if (p == null) return;
+    if (sub == null || (sub['url'] as String?) == null) {
+      p.setSubtitleTrack(SubtitleTrack.no());
+    } else {
+      p.setSubtitleTrack(SubtitleTrack.uri(
+        sub['url'] as String,
+        title: sub['label']?.toString(),
+        language: sub['language']?.toString(),
+      ));
+    }
+  }
+
+  /// Switch the HLS rendition by re-opening at the current position, then
+  /// re-apply the active subtitle (a fresh Media resets the subtitle track).
+  Future<void> _applyQuality(String label, String url) async {
+    final p = _player;
+    if (p == null || url.isEmpty) return;
+    _selectedQuality = label;
+    final pos = p.state.position;
+    await p.open(Media(url, start: pos));
+    if (_selectedSubtitle != null) _applySubtitle(_selectedSubtitle);
   }
 
   void _initYouTubePlayer(String videoId) {
@@ -116,6 +161,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return BlocConsumer<PlayerBloc, PlayerState>(
       listener: (context, state) {
         if (state is PlayerReady) {
+          // Only (re)build the player when the underlying stream changes (first
+          // load or an episode switch). Subtitle/quality/play-state changes
+          // re-emit PlayerReady but must not restart playback.
+          if (state.streamInfo.url == _currentStreamUrl) return;
+          _currentStreamUrl = state.streamInfo.url;
+          _disposePlayers();
+          _selectedSubtitle = null;
+          _selectedQuality = 'Auto';
           if (state.streamInfo.isYoutube) {
             _playerType = 'YouTube';
             _initYouTubePlayer(state.streamInfo.youtubeVideoId ?? '');
@@ -152,6 +205,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       },
                       onQualityTap: () => _showQualitySelector(context, state),
                       onSubtitleTap: () => _showSubtitleSelector(context, state),
+                      onAudioTap: () => _showAudioSelector(context, state),
                       onEpisodeTap: state.content.seriesInfo != null ? () => _showEpisodeDrawer(context) : null,
                     ),
                   ),
@@ -175,7 +229,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Widget _buildVideoView(PlayerState state) {
-    if (state is! PlayerReady && state is! PlayerReady) return const SizedBox.expand(child: ColoredBox(color: Colors.black));
+    if (state is! PlayerReady) return const SizedBox.expand(child: ColoredBox(color: Colors.black));
 
     switch (_playerType) {
       case 'YouTube':
@@ -187,15 +241,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         );
 
       case 'Vimeo':
-        final state2 = state;
-        if (state2 is PlayerReady) {
-          return InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri('https://player.vimeo.com/video/${state2.streamInfo.vimeoVideoId}?autoplay=1&byline=0&portrait=0&title=0#t=${widget.startPosition}s')),
-            initialSettings: InAppWebViewSettings(allowsInlineMediaPlayback: true, mediaPlaybackRequiresUserGesture: false, allowsAirPlayForMediaPlayback: true),
-            onWebViewCreated: (c) => _vimeoController = c,
-          );
-        }
-        return const SizedBox.expand(child: ColoredBox(color: Colors.black));
+        return InAppWebView(
+          initialUrlRequest: URLRequest(url: WebUri('https://player.vimeo.com/video/${state.streamInfo.vimeoVideoId}?autoplay=1&byline=0&portrait=0&title=0#t=${widget.startPosition}s')),
+          initialSettings: InAppWebViewSettings(allowsInlineMediaPlayback: true, mediaPlaybackRequiresUserGesture: false, allowsAirPlayForMediaPlayback: true),
+          onWebViewCreated: (c) => _vimeoController = c,
+        );
 
       default: // HLS
         if (_controller == null) return const SizedBox.expand(child: ColoredBox(color: Colors.black));
@@ -208,10 +258,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => QualitySelector(
-        qualities: state.content.videoAsset?.qualities ?? [],
-        selectedQuality: state.selectedQuality,
-        onSelect: (q) {
-          context.read<PlayerBloc>().add(PlayerQualityChanged(quality: q));
+        qualities: state.streamInfo.qualities,
+        masterUrl: state.streamInfo.url,
+        selectedQuality: _selectedQuality,
+        onSelect: (label, url) {
+          _applyQuality(label, url);
+          context.read<PlayerBloc>().add(PlayerQualityChanged(quality: label));
           Navigator.pop(context);
         },
       ),
@@ -223,10 +275,47 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => SubtitleSelector(
-        subtitles: state.content.subtitles ?? [],
-        selectedId: state.selectedSubtitle,
+        subtitles: state.streamInfo.subtitles,
+        selectedUrl: _selectedSubtitle?['url'] as String?,
+        onSelect: (sub) {
+          _applySubtitle(sub);
+          context.read<PlayerBloc>().add(PlayerSubtitleChanged(subtitle: sub?['url'] as String?));
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  void _showAudioSelector(BuildContext context, PlayerReady state) {
+    final p = _player;
+    if (p == null) return;
+    // media_kit detects the manifest's audio renditions at runtime; the backend
+    // audioTracks (if any) only enrich the labels by language code.
+    final tracks = p.state.tracks.audio.where((t) => t.id != 'no').toList();
+    final backendTracks = state.streamInfo.audioTracks;
+
+    String labelFor(AudioTrack t) {
+      if (t.id == 'auto') return 'Auto';
+      final lang = t.language;
+      if (lang != null && lang.isNotEmpty) {
+        for (final b in backendTracks) {
+          if ((b['language']?.toString().toLowerCase() ?? '') == lang.toLowerCase()) {
+            return (b['label'] ?? b['language']).toString();
+          }
+        }
+      }
+      return t.title?.isNotEmpty == true ? t.title! : (lang ?? 'Track ${t.id}');
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AudioSelector(
+        options: [for (final t in tracks) AudioOption(id: t.id, label: labelFor(t))],
+        selectedId: p.state.track.audio.id,
         onSelect: (id) {
-          context.read<PlayerBloc>().add(PlayerSubtitleChanged(subtitle: id));
+          final track = tracks.firstWhere((t) => t.id == id);
+          p.setAudioTrack(track);
           Navigator.pop(context);
         },
       ),

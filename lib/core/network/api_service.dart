@@ -224,6 +224,7 @@ class ApiService {
           ? (s['qualities'] as Map).entries.map((e) => {'quality': e.key, 'url': e.value}).toList()
           : (s['qualities'] ?? const []),
       'subtitles': s['subtitles'] ?? const [],
+      'audioTracks': s['audioTracks'] ?? const [],
       'streamSessionId': data['streamSessionId'],
     };
   }
@@ -295,27 +296,102 @@ class ApiService {
           : _map(await _dio.post('/subscriptions/iap/google', data: {'productId': productId, 'purchaseToken': purchaseToken}));
 
   Future<List<dynamic>> getInvoices() async => _list(await _dio.get('/invoices'));
+  Future<Map<String, dynamic>> getParentalControl() async => _map(await _dio.get('/profiles/parental-control'));
+  Future<void> saveParentalControl(Map<String, dynamic> data) => _dio.put('/profiles/parental-control', data: data);
 
   // ── Admin ──
   Future<Map<String, dynamic>> getAdminStats() async => _map(await _dio.get('/admin/stats'));
   Future<List<dynamic>> getAdminAnalytics({String period = '30d'}) async => _list(await _dio.get('/admin/revenue', queryParameters: {'period': period}));
+  Future<List<dynamic>> adminGetTopContent({int limit = 10}) async =>
+      _list(await _dio.get('/admin/analytics/top-content', queryParameters: {'limit': limit}));
+  Future<List<dynamic>> adminGetRegions() async => _list(await _dio.get('/admin/analytics/regions'));
+  Future<List<dynamic>> adminGetPlans() async => _list(await _dio.get('/admin/plans'));
+  Future<void> adminCreatePlan(Map<String, dynamic> data) => _dio.post('/admin/plans', data: data);
+  Future<void> adminUpdatePlan(String id, Map<String, dynamic> data) => _dio.put('/admin/plans/$id', data: data);
+  Future<List<dynamic>> adminGetPromos() async => _list(await _dio.get('/admin/promos'));
+  Future<void> adminCreatePromo(Map<String, dynamic> data) => _dio.post('/admin/promos', data: data);
+  Future<List<dynamic>> adminGetContentRows() async => _list(await _dio.get('/admin/content-rows'));
+  Future<void> adminCreateContentRow(Map<String, dynamic> data) => _dio.post('/admin/content-rows', data: data);
   Future<Map<String, dynamic>> adminGetContents({int page = 1, String? search}) async =>
       _paged(await _dio.get('/admin/contents', queryParameters: {'page': page, if (search != null) 'q': search}));
   Future<void> adminDeleteContent(String contentId) => _dio.delete('/admin/contents/$contentId');
   Future<void> adminToggleContent(String contentId, bool isActive) =>
       _dio.put('/admin/contents/$contentId', data: {'status': isActive ? 'published' : 'draft'});
-  Future<Map<String, dynamic>> adminGetUsers({int page = 1, String? search}) async =>
-      _paged(await _dio.get('/admin/users', queryParameters: {'page': page, if (search != null) 'q': search}));
+  Future<Map<String, dynamic>> adminGetUsers({int page = 1, String? search, String? role}) async =>
+      _paged(await _dio.get('/admin/users', queryParameters: {
+        'page': page,
+        if (search != null && search.isNotEmpty) 'q': search,
+        if (role != null && role != 'all') 'role': role,
+      }));
   Future<void> adminChangeUserStatus(String userId, String status) =>
       _dio.put('/admin/users/$userId/status', data: {'status': status});
   Future<List<dynamic>> adminGetLiveStreams() async => (_map(await _dio.get('/admin/live'))['items'] as List?) ?? const [];
   Future<List<dynamic>> adminGetSubscriptionPlans() async => _list(await _dio.get('/plans'));
+  Future<Map<String, dynamic>> adminGetContent(String id) async => _map(await _dio.get('/admin/contents/$id'));
+  Future<String> adminUploadContentImage(String contentId, FormData form) async =>
+      (_map(await _dio.post('/admin/contents/$contentId/image', data: form))['url'] ?? '').toString();
+  Future<List<dynamic>> adminGetGenres() async => _list(await _dio.get('/admin/genres'));
   Future<Map<String, dynamic>> adminCreateContent(Map<String, dynamic> data) async => _map(await _dio.post('/admin/contents', data: data));
   Future<Map<String, dynamic>> adminUpdateContent(String id, Map<String, dynamic> data) async => _map(await _dio.put('/admin/contents/$id', data: data));
   Future<void> adminUploadVideo(String contentId, String playerType, String? videoId, {FormData? formData}) =>
       formData != null
           ? _dio.post('/admin/contents/$contentId/video', data: formData)
           : _dio.post('/admin/contents/$contentId/video', data: {'playerType': playerType, 'videoId': videoId});
+
+  // ── Subtitle & audio track management (per title) ──
+  Future<Map<String, dynamic>> adminGetTracks(String contentId) async =>
+      _map(await _dio.get('/admin/contents/$contentId/tracks'));
+  Future<void> adminAddSubtitle(String contentId, FormData form) =>
+      _dio.post('/admin/contents/$contentId/subtitles', data: form);
+  Future<void> adminDeleteSubtitle(String contentId, String subtitleId) =>
+      _dio.delete('/admin/contents/$contentId/subtitles/$subtitleId');
+  Future<void> adminAddAudioTrack(String contentId, Map<String, dynamic> data) =>
+      _dio.post('/admin/contents/$contentId/audio-tracks', data: data);
+  Future<void> adminDeleteAudioTrack(String contentId, String trackId) =>
+      _dio.delete('/admin/contents/$contentId/audio-tracks/$trackId');
+
+  // ── Community: suggestions & polls (user) ──
+  Future<List<dynamic>> getSuggestions({String sort = 'top', String? status, int page = 1}) async =>
+      _list(await _dio.get('/suggestions', queryParameters: {
+        'sort': sort, if (status != null) 'status': status, 'page': page,
+      }));
+  Future<Map<String, dynamic>> createSuggestion(String title, String? description) async =>
+      _map(await _dio.post('/suggestions', data: {'title': title, if (description != null && description.isNotEmpty) 'description': description}));
+  Future<Map<String, dynamic>> toggleSuggestionUpvote(String id) async =>
+      _map(await _dio.post('/suggestions/$id/upvote'));
+  Future<List<dynamic>> getPolls({String status = 'active'}) async =>
+      _list(await _dio.get('/polls', queryParameters: {'status': status}));
+  Future<Map<String, dynamic>> getPoll(String id) async => _map(await _dio.get('/polls/$id'));
+  Future<Map<String, dynamic>> votePoll(String pollId, String optionId) async =>
+      _map(await _dio.post('/polls/$pollId/vote', data: {'optionId': optionId}));
+
+  // ── Community (admin) ──
+  Future<List<dynamic>> adminGetSuggestions({String? status}) async =>
+      _list(await _dio.get('/admin/suggestions', queryParameters: {if (status != null) 'status': status}));
+  Future<void> adminUpdateSuggestionStatus(String id, String status, {String? linkedContentId}) =>
+      _dio.put('/admin/suggestions/$id/status', data: {'status': status, if (linkedContentId != null) 'linkedContentId': linkedContentId});
+  Future<void> adminDeleteSuggestion(String id) => _dio.delete('/admin/suggestions/$id');
+  Future<Map<String, dynamic>> adminPromoteSuggestion(String id, {String? question, List<String>? options, String? endsAt}) async =>
+      _map(await _dio.post('/admin/suggestions/$id/promote', data: {
+        if (question != null) 'question': question,
+        'options': options ?? const [],
+        if (endsAt != null) 'endsAt': endsAt,
+      }));
+  Future<Map<String, dynamic>> adminCreatePoll({required String question, String? description, required List<String> options, String? endsAt}) async =>
+      _map(await _dio.post('/admin/polls', data: {
+        'question': question,
+        if (description != null && description.isNotEmpty) 'description': description,
+        'options': options,
+        if (endsAt != null) 'endsAt': endsAt,
+      }));
+  Future<void> adminUpdatePoll(String id, {String? question, String? description, String? status, String? endsAt}) =>
+      _dio.put('/admin/polls/$id', data: {
+        if (question != null) 'question': question,
+        if (description != null) 'description': description,
+        if (status != null) 'status': status,
+        if (endsAt != null) 'endsAt': endsAt,
+      });
+  Future<void> adminDeletePoll(String id) => _dio.delete('/admin/polls/$id');
 }
 
 class _AuthInterceptor extends Interceptor {

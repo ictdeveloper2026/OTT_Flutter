@@ -102,10 +102,12 @@ class _AdminContentScreenState extends State<AdminContentScreen> {
                   icon: const Icon(Icons.more_vert, size: 20),
                   onSelected: (action) {
                     if (action == 'edit') context.go('/admin/content/upload', extra: {'contentId': content.id});
+                    if (action == 'tracks') context.go('/admin/content/tracks', extra: {'contentId': content.id, 'title': content.title});
                     if (action == 'delete') _confirmDelete(context, content);
                   },
                   itemBuilder: (_) => const [
                     PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')])),
+                    PopupMenuItem(value: 'tracks', child: Row(children: [Icon(Icons.subtitles_outlined, size: 18), SizedBox(width: 8), Text('Subtitles & Audio')])),
                     PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))])),
                   ],
                 ),

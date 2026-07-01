@@ -10,6 +10,7 @@ import '../../data/repositories/subscription_repository.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../data/repositories/live_repository.dart';
 import '../../data/repositories/admin_repository.dart';
+import '../../data/repositories/community_repository.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
 import '../../presentation/blocs/theme/theme_bloc.dart';
 import '../../presentation/blocs/content/content_bloc.dart';
@@ -19,6 +20,7 @@ import '../../presentation/blocs/subscription/subscription_bloc.dart';
 import '../../presentation/blocs/search/search_bloc.dart';
 import '../../presentation/blocs/live/live_bloc.dart';
 import '../../presentation/blocs/admin/admin_bloc.dart';
+import '../../presentation/blocs/community/community_bloc.dart';
 import '../constants/app_constants.dart';
 
 final sl = GetIt.instance;
@@ -47,6 +49,7 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<ProfileRepository>(() => ProfileRepository(sl<ApiService>()));
   sl.registerLazySingleton<LiveRepository>(() => LiveRepository(sl<ApiService>()));
   sl.registerLazySingleton<AdminRepository>(() => AdminRepository(sl<ApiService>()));
+  sl.registerLazySingleton<CommunityRepository>(() => CommunityRepository(sl<ApiService>()));
 
   // BLoCs (factory - new instance per use)
   sl.registerFactory(() => AuthBloc(sl<AuthRepository>()));
@@ -58,4 +61,5 @@ Future<void> configureDependencies() async {
   sl.registerFactory(() => SearchBloc(sl<ContentRepository>()));
   sl.registerFactory(() => LiveBloc(sl<LiveRepository>()));
   sl.registerFactory(() => AdminBloc(sl<AdminRepository>()));
+  sl.registerFactory(() => CommunityBloc(sl<CommunityRepository>()));
 }

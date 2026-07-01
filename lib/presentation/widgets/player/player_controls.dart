@@ -15,6 +15,7 @@ class PlayerControls extends StatefulWidget {
   final VoidCallback onFullscreen;
   final VoidCallback onQualityTap;
   final VoidCallback onSubtitleTap;
+  final VoidCallback onAudioTap;
   final VoidCallback? onEpisodeTap;
 
   const PlayerControls({
@@ -28,6 +29,7 @@ class PlayerControls extends StatefulWidget {
     required this.onFullscreen,
     required this.onQualityTap,
     required this.onSubtitleTap,
+    required this.onAudioTap,
     this.onEpisodeTap,
   });
 
@@ -109,6 +111,8 @@ class _PlayerControlsState extends State<PlayerControls> {
               if (widget.onEpisodeTap != null)
                 IconButton(icon: const Icon(Icons.playlist_play_rounded, color: Colors.white), onPressed: widget.onEpisodeTap),
               IconButton(icon: const Icon(Icons.closed_caption_outlined, color: Colors.white), onPressed: widget.onSubtitleTap),
+              if (widget.playerType == 'HLS')
+                IconButton(icon: const Icon(Icons.multitrack_audio_rounded, color: Colors.white), tooltip: 'Audio', onPressed: widget.onAudioTap),
               IconButton(icon: const Icon(Icons.hd_outlined, color: Colors.white), onPressed: widget.onQualityTap),
               _SpeedButton(speed: _playbackSpeed, onSelect: (s) { setState(() => _playbackSpeed = s); widget.player?.setRate(s); }),
               if (!widget.isFullscreen)
